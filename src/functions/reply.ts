@@ -71,9 +71,7 @@ export default function reply (){
         const chatInput: HTMLTextAreaElement | null = document.getElementById("InputChat") as HTMLTextAreaElement | null;
         chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
 	    chatInput.focus();
-
-        console.log(Player.ChatSettings.ColorTheme)
-
+        
     } 
 }
 
