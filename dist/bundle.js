@@ -58,7 +58,7 @@
         mod.patchFunction("ChatRoomMessageDisplay", {
             'const div = ElementCreate': `const replyButton = ElementButton.Create(
                 null, ${chatReply}, { noStyling: true },
-                { button: { classList: ["ReplyButton"], children: ["\u21a9\ufe0f"] } }
+                { button: { classList: ["ChatReplyButton"], children: ["\u21a9\ufe0f"] } }
             );
         replyButton.style.display = "none";    
         if(data.Type === "Chat"){
@@ -118,7 +118,21 @@
         }
     }
 
+    chatReplyButtonCss();
     commands();
     reply();
+    function chatReplyButtonCss() {
+        const style = document.createElement("style");
+        style.innerHTML = `
+    .ChatReplyButton {
+        text-decoration: none;
+        font-style: normal;
+        display: inline;
+        cursor: pointer;
+        font-size: smaller;
+    }
+    `;
+        document.head.appendChild(style);
+    }
 
 })();

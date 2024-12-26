@@ -8,7 +8,7 @@ export default function reply (){
         'const div = ElementCreate': 
         `const replyButton = ElementButton.Create(
                 null, ${chatReply}, { noStyling: true },
-                { button: { classList: ["ReplyButton"], children: ["\u21a9\ufe0f"] } }
+                { button: { classList: ["ChatReplyButton"], children: ["\u21a9\ufe0f"] } }
             );
         replyButton.style.display = "none";    
         if(data.Type === "Chat"){

@@ -18,12 +18,12 @@ export default {
 			tsconfig: "./tsconfig.json",
 			inlineSources: true
 		}),
-    terser({
+    /*terser({
       compress: {
           drop_console: true
       },
       mangle: true
-    }),
+    }),*/
     /*obfuscator({
       compact: true,
       controlFlowFlattening: true,
