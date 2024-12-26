@@ -10,10 +10,11 @@
                 const [targetNumber, ...messageParts] = args.split(" ");
                 const message = messageParts.join(" ");
                 if (message && message != "") {
+                    let generatedMessage = ChatRoomGenerateChatRoomChatMessage("Chat", message);
                     ServerSend("ChatRoomChat", {
-                        Content: message,
-                        Type: "Chat",
-                        Target: null,
+                        Content: generatedMessage.Content,
+                        Type: generatedMessage.Type,
+                        Target: generatedMessage.Target,
                         Dictionary: [
                             { targetId: targetNumber },
                             { repliedMessage: Player.ExtensionSettings.BCA.repliedMessage },
@@ -114,7 +115,6 @@
             const chatInput = document.getElementById("InputChat");
             chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
             chatInput.focus();
-            console.log(Player.ChatSettings.ColorTheme);
         }
     }
 

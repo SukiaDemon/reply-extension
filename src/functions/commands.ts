@@ -9,12 +9,13 @@ export default function commands (){
             const [targetNumber, ...messageParts] = args.split(" ");
             const message: string = messageParts.join(" ");
             if(message && message != ""){
+                let generatedMessage = ChatRoomGenerateChatRoomChatMessage("Chat", message);
                 ServerSend(
                     "ChatRoomChat",
                     {
-                        Content: message,
-                        Type: "Chat",
-                        Target: null,
+                        Content: generatedMessage.Content,
+                        Type: generatedMessage.Type,
+                        Target: generatedMessage.Target,
                         Dictionary: [
                             {targetId: targetNumber},
                             {repliedMessage: Player.ExtensionSettings.BCA.repliedMessage},
