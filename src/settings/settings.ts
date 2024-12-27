@@ -15,7 +15,7 @@ export const defaultSettings: Settings = {
 }
 
 let BCAPlayerInfos: BCAPlayerInfos = {
-    settings: defaultSettings,
+    settings: {...defaultSettings},
     targetUser: "",
     repliedMessage: ""
 }
