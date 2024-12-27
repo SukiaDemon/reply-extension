@@ -1,12 +1,12 @@
-import { ReplyContent } from './../models/replyContent';
-import { mod } from "mod";
+import {ReplyContent} from './../models/replyContent';
+import {mod} from "mod";
 
-export default function reply (){
+export default function reply() {
 
     //Pushing the reply button with the custom "chatReply" func into "divChildren" array
     mod.patchFunction("ChatRoomMessageDisplay", {
-        'const div = ElementCreate': 
-        `const replyButton = ElementButton.Create(
+        'const div = ElementCreate':
+            `const replyButton = ElementButton.Create(
                 null, ${chatReply}, { noStyling: true },
                 { button: { classList: ["ChatReplyButton"], children: ["\u21a9\ufe0f"] } }
             );
@@ -18,12 +18,7 @@ export default function reply (){
                 let messageText = data.Dictionary[1].repliedMessage
 
                 replyDiv.textContent = data.Dictionary?.[2]?.targetUser + ": " + messageText;
-                replyDiv.style.fontSize = "0.8em";
-                replyDiv.style.marginTop = "5px";
-                replyDiv.style.backgroundColor = "lightgray";
-                replyDiv.style.color = "black";
-                replyDiv.style.padding = "5px";
-                replyDiv.style.borderRadius = "4px";
+                replyDiv.classList.add("ChatReplyBox");
                 divChildren.unshift(replyDiv)
             }
             divChildren.push(
@@ -32,10 +27,10 @@ export default function reply (){
             )
         }
         const div = ElementCreate`
-      });
+    });
 
-      mod.patchFunction("ChatRoomMessageDisplay", {
-        'ChatRoomAppendChat(div);': 
+    mod.patchFunction("ChatRoomMessageDisplay", {
+        'ChatRoomAppendChat(div);':
             `div.onmouseenter = () => {
                 replyButton.style.display = "inline-block";
             };
@@ -43,39 +38,35 @@ export default function reply (){
                 replyButton.style.display = "none";
             };
             ChatRoomAppendChat(div);`
-      });
-      
-      function chatReply() {
+    });
+
+    function chatReply() {
         const sender = Number.parseInt(this.parentElement?.dataset.sender, 10);
         const chatMessageDiv = this.parentElement;
         const userNameButton = this.parentElement.querySelector('.ChatMessageName');
         const userName = userNameButton.innerText;
         let messageText: string = "";
         chatMessageDiv.childNodes
-        .forEach(node => {
-            if (node.nodeType === Node.TEXT_NODE) {
-            const text: string = node.textContent.trim();
-                if (text) {
-                    messageText += " " + text;
+            .forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text: string = node.textContent.trim();
+                    if (text) {
+                        messageText += " " + text;
+                    }
                 }
-            }
-        });
+            });
 
         messageText = messageText.slice(3);
         console.log(messageText)
 
-        const replyContent: ReplyContent = {
-            targetUser: userName,
-            repliedMessage: messageText
-        }
-
-        Player.ExtensionSettings.BCA = replyContent;
+        Player.ExtensionSettings.BCA.targetUser = userName;
+        Player.ExtensionSettings.BCA.repliedMessage = messageText;
 
         const chatInput: HTMLTextAreaElement | null = document.getElementById("InputChat") as HTMLTextAreaElement | null;
         chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
-	    chatInput.focus();
-        
-    } 
+        chatInput.focus();
+
+    }
 }
 
 

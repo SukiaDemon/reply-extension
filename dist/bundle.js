@@ -22,7 +22,8 @@
                         ]
                     });
                 }
-                Player.ExtensionSettings.BCA = {};
+                Player.ExtensionSettings.BCA.repliedMessage = "";
+                Player.ExtensionSettings.BCA.targetUser = "";
             }
         });
     }
@@ -68,12 +69,7 @@
                 let messageText = data.Dictionary[1].repliedMessage
 
                 replyDiv.textContent = data.Dictionary?.[2]?.targetUser + ": " + messageText;
-                replyDiv.style.fontSize = "0.8em";
-                replyDiv.style.marginTop = "5px";
-                replyDiv.style.backgroundColor = "lightgray";
-                replyDiv.style.color = "black";
-                replyDiv.style.padding = "5px";
-                replyDiv.style.borderRadius = "4px";
+                replyDiv.classList.add("ChatReplyBox");
                 divChildren.unshift(replyDiv)
             }
             divChildren.push(
@@ -109,20 +105,18 @@
             });
             messageText = messageText.slice(3);
             console.log(messageText);
-            const replyContent = {
-                targetUser: userName,
-                repliedMessage: messageText
-            };
-            Player.ExtensionSettings.BCA = replyContent;
+            Player.ExtensionSettings.BCA.targetUser = userName;
+            Player.ExtensionSettings.BCA.repliedMessage = messageText;
             const chatInput = document.getElementById("InputChat");
             chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
             chatInput.focus();
         }
     }
 
-    chatReplyButtonCss();
-    commands();
-    reply();
+    function loadCss() {
+        chatReplyButtonCss();
+        chatReplyBoxCss();
+    }
     function chatReplyButtonCss() {
         const style = document.createElement("style");
         style.innerHTML = `
@@ -136,5 +130,97 @@
     `;
         document.head.appendChild(style);
     }
+    function chatReplyBoxCss() {
+        const style = document.createElement("style");
+        style.innerHTML =
+            `
+            :root {
+                --reply-background-color: ${Player.ExtensionSettings.BCA.settings.replyBackgroundColor};
+                --reply-text-color: ${Player.ExtensionSettings.BCA.settings.replyTextColor};
+            }
+
+            .ChatReplyBox {
+                font-size: 0.8em;
+                margin-top: 5px;
+                background-color: var(--reply-background-color);
+                color: var(--reply-text-color);
+                padding: 5px;
+                border-radius: 4px;
+             }
+        `;
+        document.head.appendChild(style);
+    }
+
+    function settingsPage() {
+        let hideBackGroundColorPicker = true;
+        PreferenceRegisterExtensionSetting({
+            Identifier: "BCA",
+            ButtonText: "BCA Settings",
+            Image: undefined, // TODO: Need to find/create cool image
+            load: PreferenceSubScreenBCASettingsLoad,
+            click: PreferenceSubScreenBCASettingsClick,
+            run: PreferenceSubScreenBCASettingsRun,
+            exit: PreferenceSubScreenBCASettingsExit,
+        });
+        function PreferenceSubScreenBCASettingsLoad() {
+            ElementCreateInput("InputReplyBoxBackgroundColor", "text", Player.ExtensionSettings.BCA.settings.replyBackgroundColor);
+            hideBackGroundColorPicker = true;
+        }
+        function PreferenceSubScreenBCASettingsClick() {
+            if (MouseIn(1815, 75, 90, 90)) {
+                PreferenceSubScreenBCASettingsExit();
+            }
+            if (MouseIn(1140, 215, 65, 65)) {
+                hideBackGroundColorPicker = !hideBackGroundColorPicker;
+            }
+        }
+        function PreferenceSubScreenBCASettingsRun() {
+            DrawCharacter(Player, 50, 50, 0.9);
+            DrawButton(1815, 75, 90, 90, "", "White", "Icons/Exit.png");
+            DrawText("Reply box background color: ", 630, 250, "Black", "Gray");
+            ElementPosition("InputReplyBoxBackgroundColor", 1000, 250, 250);
+            DrawButton(1140, 215, 65, 65, "", "White", "Icons/Color.png");
+            if (hideBackGroundColorPicker) {
+                ColorPickerHide();
+            }
+            else {
+                ColorPickerDraw(1250, 185, 675, 800, document.getElementById("InputReplyBoxBackgroundColor"));
+            }
+        }
+        function PreferenceSubScreenBCASettingsExit() {
+            const ReplyBoxBackgroundColor = ElementValue("InputReplyBoxBackgroundColor");
+            if (CommonIsColor(ReplyBoxBackgroundColor)) {
+                updateChatReplyBoxColors(ReplyBoxBackgroundColor);
+            }
+            ElementRemove("InputReplyBoxBackgroundColor");
+            PreferenceSubscreenExtensionsClear();
+        }
+    }
+    function updateChatReplyBoxColors(newBackgroundColor, newTextColor) {
+        document.documentElement.style.setProperty('--reply-background-color', newBackgroundColor);
+        Player.ExtensionSettings.BCA.settings.replyBackgroundColor = newBackgroundColor;
+        //document.documentElement.style.setProperty('--reply-text-color', newTextColor);
+    }
+
+    const defaultSettings = {
+        replyBackgroundColor: "#D3D3D3",
+        replyTextColor: "#000000"
+    };
+    let BCAPlayerInfos = {
+        settings: defaultSettings,
+        targetUser: "",
+        repliedMessage: ""
+    };
+    function settings() {
+        if (!Player.ExtensionSettings.BCA) {
+            Player.ExtensionSettings.BCA = BCAPlayerInfos;
+        }
+    }
+
+    settings();
+    settingsPage();
+    loadCss();
+    commands();
+    reply();
 
 })();

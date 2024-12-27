@@ -1,21 +1,11 @@
 import commands from "functions/commands";
 import reply from "functions/reply";
+import {loadCss} from "./css/css";
+import {settingsPage} from "./settings/settingsPage";
+import {settings} from "./settings/settings";
 
-chatReplyButtonCss();
+settings();
+settingsPage()
+loadCss();
 commands();
 reply();
-
-
-function chatReplyButtonCss() {
-    const style = document.createElement("style");
-    style.innerHTML = `
-    .ChatReplyButton {
-        text-decoration: none;
-        font-style: normal;
-        display: inline;
-        cursor: pointer;
-        font-size: smaller;
-    }
-    `;
-    document.head.appendChild(style);
-}

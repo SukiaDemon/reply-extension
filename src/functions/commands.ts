@@ -1,14 +1,14 @@
-import { ReplyContent } from "models/replyContent";
+import {ReplyContent} from "models/replyContent";
 
-export default function commands (){
+export default function commands() {
     CommandCombine({
         Tag: "reply",
         "Description": "reply to a chat message",
-        Action: (args:string)  => {
+        Action: (args: string) => {
             console.log(args.split(" "))
             const [targetNumber, ...messageParts] = args.split(" ");
             const message: string = messageParts.join(" ");
-            if(message && message != ""){
+            if (message && message != "") {
                 let generatedMessage = ChatRoomGenerateChatRoomChatMessage("Chat", message);
                 ServerSend(
                     "ChatRoomChat",
@@ -21,10 +21,11 @@ export default function commands (){
                             {repliedMessage: Player.ExtensionSettings.BCA.repliedMessage},
                             {targetUser: Player.ExtensionSettings.BCA.targetUser}
                         ] as ReplyContent[]
-                    }as any
+                    } as any
                 )
             }
-            Player.ExtensionSettings.BCA = {}
-    }
-})
+            Player.ExtensionSettings.BCA.repliedMessage = "";
+            Player.ExtensionSettings.BCA.targetUser = "";
+        }
+    })
 }
