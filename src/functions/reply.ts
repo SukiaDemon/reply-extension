@@ -56,10 +56,13 @@ export default function reply (){
             if (node.nodeType === Node.TEXT_NODE) {
             const text: string = node.textContent.trim();
                 if (text) {
-                    messageText = text; 
+                    messageText += " " + text;
                 }
             }
         });
+
+        messageText = messageText.slice(3);
+        console.log(messageText)
 
         const replyContent: ReplyContent = {
             targetUser: userName,

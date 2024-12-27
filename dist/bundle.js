@@ -103,10 +103,12 @@
                 if (node.nodeType === Node.TEXT_NODE) {
                     const text = node.textContent.trim();
                     if (text) {
-                        messageText = text;
+                        messageText += " " + text;
                     }
                 }
             });
+            messageText = messageText.slice(3);
+            console.log(messageText);
             const replyContent = {
                 targetUser: userName,
                 repliedMessage: messageText
