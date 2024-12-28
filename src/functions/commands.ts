@@ -6,7 +6,6 @@ export default function commands() {
         Tag: "reply",
         "Description": "reply to a chat message",
         Action: (args: string) => {
-            console.log(args.split(" "))
             const [targetNumber, ...messageParts] = args.split(" ");
             const message: string = messageParts.join(" ");
             if (message && message != "") {

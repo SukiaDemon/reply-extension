@@ -4,7 +4,6 @@ export default function reply() {
 
     mod.hookFunction("ChatRoomMessage", 1, (args, next) => {
         next(args)
-        console.log(args)
         if (args[0] && args[0].Type && args[0].Type == "Chat") {
             if (args[0].Content && args[0].Sender) {
                 addButtonToLastMessage(args[0].Content, args[0].Sender);
@@ -37,7 +36,6 @@ function addButtonToLastMessage(messageText: string, messageSender: number) {
         let button = ElementButton.Create(
             null,
             function (this: HTMLButtonElement, ev: MouseEvent | TouchEvent) {
-                console.log(messageText)
                 repliedMessage = messageText;
                 sender = userName;
                 const chatInput: HTMLTextAreaElement | null = document.getElementById("InputChat") as HTMLTextAreaElement | null;

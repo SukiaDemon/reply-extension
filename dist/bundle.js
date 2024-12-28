@@ -30,7 +30,6 @@
 	function reply() {
 	    mod.hookFunction("ChatRoomMessage", 1, (args, next) => {
 	        next(args);
-	        console.log(args);
 	        if (args[0] && args[0].Type && args[0].Type == "Chat") {
 	            if (args[0].Content && args[0].Sender) {
 	                addButtonToLastMessage(args[0].Content, args[0].Sender);
@@ -53,7 +52,6 @@
 	        const userNameDiv = lastMessage.querySelector('.ChatMessageName');
 	        const userName = userNameDiv.innerText;
 	        let button = ElementButton.Create(null, function (ev) {
-	            console.log(messageText);
 	            repliedMessage = messageText;
 	            sender = userName;
 	            const chatInput = document.getElementById("InputChat");
@@ -94,7 +92,6 @@
 	        Tag: "reply",
 	        "Description": "reply to a chat message",
 	        Action: (args) => {
-	            console.log(args.split(" "));
 	            const [targetNumber, ...messageParts] = args.split(" ");
 	            const message = messageParts.join(" ");
 	            if (message && message != "") {
