@@ -1,4 +1,5 @@
 import {ReplyContent} from "models/replyContent";
+import {repliedMessage, sender} from "./reply";
 
 export default function commands() {
     CommandCombine({
@@ -17,9 +18,7 @@ export default function commands() {
                         Type: generatedMessage.Type,
                         Target: generatedMessage.Target,
                         Dictionary: [
-                            {targetId: targetNumber},
-                            {repliedMessage: Player.ExtensionSettings.BCA.repliedMessage},
-                            {targetUser: Player.ExtensionSettings.BCA.targetUser}
+                            {targetId: targetNumber, repliedMessage: repliedMessage, targetUser: sender},
                         ] as ReplyContent[]
                     } as any
                 )
