@@ -51,6 +51,12 @@ export default function reply() {
         }
     })
 
+    mod.hookFunction("ElementScrollToEnd", 1, (args, next) => {
+        setTimeout(() => {
+            next(args)
+        }, 1);
+    })
+
 }
 
 export let repliedMessage: string = "";

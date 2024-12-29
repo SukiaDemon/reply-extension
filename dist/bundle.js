@@ -69,6 +69,11 @@
 	            chatInput.placeholder = "Talk to everyone";
 	        }
 	    });
+	    mod.hookFunction("ElementScrollToEnd", 1, (args, next) => {
+	        setTimeout(() => {
+	            next(args);
+	        }, 1);
+	    });
 	}
 	let repliedMessage = "";
 	let repliedMessageAuthor;
