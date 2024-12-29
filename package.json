@@ -18,6 +18,8 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
+    "@rollup/plugin-image": "^3.0.3",
+    "@rollup/plugin-url": "^8.0.2",
     "bc-stubs": "^106.0.0",
     "bondage-club-mod-sdk": "^1.2.0",
     "rollup": "^4.19.0",
@@ -27,7 +29,5 @@
     "typescript-eslint": "^7.16.1"
   },
   "dependencies": {
-    "@rollup/plugin-image": "^3.0.3",
-    "@rollup/plugin-url": "^8.0.2"
   }
 }
