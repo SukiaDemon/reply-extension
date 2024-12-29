@@ -1,7 +1,7 @@
 import {mod} from "mod";
 import {ReplyContent} from "../models/replyContent";
 
-export let replyMode: boolean = false;
+export let isReplyMode: boolean = false;
 
 export default function reply() {
 
@@ -32,20 +32,20 @@ export default function reply() {
 
     mod.hookFunction("ServerSend", 1, (args, next) => {
         let replyMessageData: ReplyContent = {
-            isReplyMessage: replyMode,
+            isReplyMessage: isReplyMode,
             targetId: repliedMessageAuthorNumber,
             repliedMessage: repliedMessage,
             repliedMessageAuthor: repliedMessageAuthor
         };
 
         if (args[1] && args[1]["Content"] && args[1]["Type"] == "Chat") {
-            if (replyMode) {
+            if (isReplyMode) {
                 args[1]["Dictionary"].push(replyMessageData);
             }
         }
         next(args);
         if (args[1] && args[1]["Content"] && args[1]["Type"] == "Chat") {
-            replyMode = false;
+            isReplyMode = false;
             const chatInput: HTMLTextAreaElement | null = document.getElementById("InputChat") as HTMLTextAreaElement | null;
             chatInput.placeholder = "Talk to everyone"
         }
@@ -73,14 +73,42 @@ function addButtonToLastMessage(messageText: string, messageSenderNumber: number
         let button = ElementButton.Create(
             null,
             function (this: HTMLButtonElement, ev: MouseEvent | TouchEvent) {
+
+                const closeButtonHtml = document.getElementById("chat-room-reply-close") as HTMLElement
+
                 repliedMessage = messageText;
                 repliedMessageAuthor = userName;
                 repliedMessageAuthorNumber = messageSenderNumber;
+
                 const chatInput: HTMLTextAreaElement | null = document.getElementById("InputChat") as HTMLTextAreaElement | null;
                 //chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
-                replyMode = true;
+                isReplyMode = true;
                 chatInput.placeholder = "Reply to " + repliedMessageAuthor;
                 chatInput.focus();
+
+                if (!closeButtonHtml) {
+                    const closeButton = ElementButton.Create(
+                        "chat-room-reply-close", () => {
+                            isReplyMode = false;
+                            chatInput.placeholder = "Talk to everyone"
+                            repliedMessage = "";
+                            repliedMessageAuthor = "";
+                            repliedMessageAuthorNumber = null;
+                            const closeButtonHtmlAfterClick = document.getElementById("chat-room-reply-close") as HTMLElement
+                            closeButtonHtmlAfterClick.remove();
+                            collapseButton.setAttribute("aria-expanded", "false");
+                            collapseButton.textContent = "<"
+                        },
+                        // @ts-ignore
+                        {noStyling: true},
+                        {button: {classList: ["chat-room-button"]}},
+                    )
+                    const buttonBox = document.getElementById("chat-room-buttons") as HTMLTextAreaElement
+                    const collapseButton = document.getElementById("chat-room-buttons-collapse") as HTMLElement;
+                    collapseButton.setAttribute("aria-expanded", "true");
+                    collapseButton.textContent = ">"
+                    buttonBox.appendChild(closeButton);
+                }
             },
             // @ts-ignore
             {noStyling: true},

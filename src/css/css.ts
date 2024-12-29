@@ -1,6 +1,9 @@
+import replyCloseButton from '../img/Remove.png'
+
 export function loadCss() {
     chatReplyButtonCss();
     chatReplyBoxCss();
+    chatReplyClose();
 }
 
 function chatReplyButtonCss() {
@@ -34,6 +37,18 @@ function chatReplyBoxCss() {
                 padding: 5px;
                 border-radius: 4px;
              }
+        `;
+    document.head.appendChild(style);
+}
+
+function chatReplyClose() {
+    const style = document.createElement("style");
+    style.innerHTML =
+        `
+            #chat-room-reply-close::before {
+            background-image: url("${replyCloseButton}");
+            mask-image: url("${replyCloseButton}");
+        }
         `;
     document.head.appendChild(style);
 }
