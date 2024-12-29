@@ -27,22 +27,53 @@
 	    repository: MOD_REPOSITORY,
 	});
 
+	let replyMode = false;
 	function reply() {
 	    mod.hookFunction("ChatRoomMessage", 1, (args, next) => {
 	        next(args);
+	        console.log(args);
+	        console.log("ChatroomMessage");
 	        if (args[0] && args[0].Type && args[0].Type == "Chat") {
-	            if (args[0].Content && args[0].Sender) {
+	            let chatMessage = args[0];
+	            if (chatMessage.Content && chatMessage.Sender) {
 	                addButtonToLastMessage(args[0].Content, args[0].Sender);
 	            }
-	            if (args[0].Dictionary && args[0].Dictionary[0]["repliedMessage"] && args[0].Dictionary[0]["targetUser"]) {
-	                addReplyBoxToLastMessage(args[0].Dictionary[0]["repliedMessage"], args[0].Dictionary[0]["targetUser"]);
+	            // @ts-ignore
+	            let replyMessageData = chatMessage.Dictionary.find(obj => {
+	                if (obj["isReplyMessage"] && obj["isReplyMessage"] == true) {
+	                    return obj;
+	                }
+	                return false;
+	            });
+	            if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
+	                addReplyBoxToLastMessage(replyMessageData.repliedMessage, replyMessageData.repliedMessageAuthor);
 	            }
+	        }
+	    });
+	    mod.hookFunction("ServerSend", 1, (args, next) => {
+	        let replyMessageData = {
+	            isReplyMessage: true,
+	            targetId: repliedMessageAuthorNumber,
+	            repliedMessage: repliedMessage,
+	            repliedMessageAuthor: repliedMessageAuthor
+	        };
+	        if (args[1] && args[1]["Content"] && args[1]["Type"] == "Chat") {
+	            if (replyMode) {
+	                args[1]["Dictionary"].push(replyMessageData);
+	            }
+	        }
+	        next(args);
+	        if (args[1] && args[1]["Content"] && args[1]["Type"] == "Chat") {
+	            replyMode = false;
+	            const chatInput = document.getElementById("InputChat");
+	            chatInput.placeholder = "Talk to everyone";
 	        }
 	    });
 	}
 	let repliedMessage = "";
-	let sender;
-	function addButtonToLastMessage(messageText, messageSender) {
+	let repliedMessageAuthor;
+	let repliedMessageAuthorNumber;
+	function addButtonToLastMessage(messageText, messageSenderNumber) {
 	    const chatContainer = document.querySelector('#TextAreaChatLog');
 	    let lastMessage = null;
 	    if (chatContainer) {
@@ -53,9 +84,12 @@
 	        const userName = userNameDiv.innerText;
 	        let button = ElementButton.Create(null, function (ev) {
 	            repliedMessage = messageText;
-	            sender = userName;
+	            repliedMessageAuthor = userName;
+	            repliedMessageAuthorNumber = messageSenderNumber;
 	            const chatInput = document.getElementById("InputChat");
-	            chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
+	            //chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
+	            replyMode = true;
+	            chatInput.placeholder = "Reply to " + repliedMessageAuthor;
 	            chatInput.focus();
 	        }, 
 	        // @ts-ignore
@@ -101,7 +135,7 @@
 	                    Type: generatedMessage.Type,
 	                    Target: generatedMessage.Target,
 	                    Dictionary: [
-	                        { targetId: targetNumber, repliedMessage: repliedMessage, targetUser: sender },
+	                        { targetId: targetNumber, repliedMessage: repliedMessage, targetUser: repliedMessageAuthor },
 	                    ]
 	                });
 	            }
