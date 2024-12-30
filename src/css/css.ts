@@ -69,7 +69,13 @@ function chatReplyClose() {
             #chat-room-reply-close::before {
             background-image: url("${replyCloseButton}");
             mask-image: url("${replyCloseButton}");
+            transition: filter 0.3s ease;
         }
+        
+            #chat-room-reply-close:hover::before {
+            filter: brightness(0) saturate(100%) invert(42%) sepia(100%) saturate(2968%) hue-rotate(179deg) brightness(106%) contrast(101%);
+        }
+        
         `;
     document.head.appendChild(style);
 }

@@ -107,7 +107,13 @@
             #chat-room-reply-close::before {
             background-image: url("${img}");
             mask-image: url("${img}");
+            transition: filter 0.3s ease;
         }
+        
+            #chat-room-reply-close:hover::before {
+            filter: brightness(0) saturate(100%) invert(42%) sepia(100%) saturate(2968%) hue-rotate(179deg) brightness(106%) contrast(101%);
+        }
+        
         `;
 	    document.head.appendChild(style);
 	}
@@ -278,7 +284,7 @@
 	    replyBackgroundColor: "#D3D3D3",
 	    replyTextColor: "#000000",
 	    enableCustomFocusColor: true,
-	    customFocusColor: "red"
+	    customFocusColor: "#FF0000"
 	};
 	let BCAPlayerInfos = {
 	    settings: { ...defaultSettings },
@@ -292,6 +298,7 @@
 	function settingsPage() {
 	    let hideBackGroundColorPicker = true;
 	    let hideTextColorPicker = true;
+	    let hideCustomFocusColorPicker = true;
 	    PreferenceRegisterExtensionSetting({
 	        Identifier: "BCA",
 	        ButtonText: "BCA Settings",
@@ -306,8 +313,11 @@
 	        ElementCreateInput("InputReplyBoxBackgroundColor", "text", Player.ExtensionSettings.BCA.settings.replyBackgroundColor);
 	        //ReplyTextColor Input Field
 	        ElementCreateInput("InputReplyTextColor", "text", Player.ExtensionSettings.BCA.settings.replyTextColor);
+	        //CustomFocusColor Input field
+	        ElementCreateInput("InputCustomFocusColor", "text", Player.ExtensionSettings.BCA.settings.customFocusColor);
 	        hideBackGroundColorPicker = true;
 	        hideTextColorPicker = true;
+	        hideCustomFocusColorPicker = true;
 	    }
 	    function PreferenceSubScreenBCASettingsClick() {
 	        if (MouseIn(1815, 75, 90, 90)) { //Exit Icon Click
@@ -315,17 +325,28 @@
 	        }
 	        if (MouseIn(1140, 215, 65, 65)) { //ReplyBoxBackgroundColor Icon Click
 	            hideTextColorPicker = true;
+	            hideCustomFocusColorPicker = true;
 	            ColorPickerHide();
 	            hideBackGroundColorPicker = !hideBackGroundColorPicker;
 	        }
 	        if (MouseIn(1140, 315, 65, 65)) { //ReplyTextColor Icon Click
 	            hideBackGroundColorPicker = true;
+	            hideCustomFocusColorPicker = true;
 	            ColorPickerHide();
 	            hideTextColorPicker = !hideTextColorPicker;
+	        }
+	        if (MouseIn(1140, 515, 65, 65)) { //ReplyTextColor Icon Click
+	            hideBackGroundColorPicker = true;
+	            hideTextColorPicker = true;
+	            ColorPickerHide();
+	            hideCustomFocusColorPicker = !hideCustomFocusColorPicker;
 	        }
 	        if (MouseIn(600, 715, 300, 100)) {
 	            ElementValue("InputReplyBoxBackgroundColor", defaultSettings.replyBackgroundColor);
 	            ElementValue("InputReplyTextColor", defaultSettings.replyTextColor);
+	        }
+	        if (MouseIn(1000, 415, 64, 64)) {
+	            Player.ExtensionSettings.BCA.settings.enableCustomFocusColor = !Player.ExtensionSettings.BCA.settings.enableCustomFocusColor;
 	        }
 	    }
 	    function PreferenceSubScreenBCASettingsRun() {
@@ -339,40 +360,49 @@
 	        ElementPosition("InputReplyTextColor", 1000, 350, 250); //ReplyTextColor ColorPicker Position
 	        DrawButton(1140, 315, 65, 65, "", "White", "Icons/Color.png"); //ReplyTextColor Icon Position
 	        updateInputFieldTextColor("InputReplyTextColor");
-	        if (hideBackGroundColorPicker) {
-	            if (hideTextColorPicker) {
-	                ColorPickerHide();
-	            }
-	        }
-	        else {
+	        addCheckBox([1000, 415, 64, 64], "Enable custom color", Player.ExtensionSettings.BCA.settings.enableCustomFocusColor);
+	        DrawText("Custom chat focus color: ", 660, 550, "Black", "Gray"); //CustomFocusColor Label
+	        ElementPosition("InputCustomFocusColor", 1000, 550, 250); //CustomFocusColor ColorPicker Position
+	        DrawButton(1140, 515, 65, 65, "", "White", "Icons/Color.png"); //CustomFocusColor Icon Position
+	        updateInputFieldTextColor("InputCustomFocusColor");
+	        if (!hideBackGroundColorPicker) {
 	            ColorPickerDraw(1250, 185, 675, 800, document.getElementById("InputReplyBoxBackgroundColor"));
 	        }
-	        if (hideTextColorPicker) {
-	            if (hideBackGroundColorPicker) {
-	                ColorPickerHide();
-	            }
-	        }
-	        else {
+	        if (!hideTextColorPicker) {
 	            ColorPickerDraw(1250, 185, 675, 800, document.getElementById("InputReplyTextColor"));
+	        }
+	        if (!hideCustomFocusColorPicker) {
+	            ColorPickerDraw(1250, 185, 675, 800, document.getElementById("InputCustomFocusColor"));
 	        }
 	        DrawButton(600, 715, 300, 100, "Restore to default", "White");
 	    }
 	    function PreferenceSubScreenBCASettingsExit() {
 	        const ReplyBoxBackgroundColor = ElementValue("InputReplyBoxBackgroundColor");
 	        const ReplyTextColor = ElementValue("InputReplyTextColor");
-	        if (CommonIsColor(ReplyBoxBackgroundColor)) {
-	            updateChatReplyBoxColors(ReplyBoxBackgroundColor, ReplyTextColor);
+	        const customFocusColor$1 = ElementValue("InputCustomFocusColor");
+	        updateChatReplyBoxColors(ReplyBoxBackgroundColor, ReplyTextColor, customFocusColor$1);
+	        if (!Player.ExtensionSettings.BCA.settings.enableCustomFocusColor) {
+	            customFocusColor.disable();
 	        }
 	        ElementRemove("InputReplyBoxBackgroundColor");
 	        ElementRemove("InputReplyTextColor");
+	        ElementRemove("InputCustomFocusColor");
 	        PreferenceSubscreenExtensionsClear();
 	    }
 	}
-	function updateChatReplyBoxColors(newBackgroundColor, newTextColor) {
-	    document.documentElement.style.setProperty('--reply-background-color', newBackgroundColor);
-	    Player.ExtensionSettings.BCA.settings.replyBackgroundColor = newBackgroundColor;
-	    document.documentElement.style.setProperty('--reply-text-color', newTextColor);
-	    Player.ExtensionSettings.BCA.settings.replyTextColor = newTextColor;
+	function updateChatReplyBoxColors(newBackgroundColor, newTextColor, customFocusColor$1) {
+	    if (CommonIsColor(newBackgroundColor) && CommonIsColor(newTextColor) && CommonIsColor(customFocusColor$1)) {
+	        document.documentElement.style.setProperty('--reply-background-color', newBackgroundColor);
+	        Player.ExtensionSettings.BCA.settings.replyBackgroundColor = newBackgroundColor;
+	        document.documentElement.style.setProperty('--reply-text-color', newTextColor);
+	        Player.ExtensionSettings.BCA.settings.replyTextColor = newTextColor;
+	        if (Player.ExtensionSettings.BCA.settings.enableCustomFocusColor) {
+	            Player.ExtensionSettings.BCA.settings.customFocusColor = customFocusColor$1;
+	            if (isReplyMode) {
+	                customFocusColor.enable(customFocusColor$1);
+	            }
+	        }
+	    }
 	}
 	function updateInputFieldTextColor(id) {
 	    let TextColorCSS = "";
@@ -388,6 +418,11 @@
 	    else {
 	        document.getElementById(id).style.backgroundColor = "#FFFFFF";
 	    }
+	}
+	function addCheckBox(cords, label, enabled) {
+	    let checkImage = enabled ? "Icons/Checked.png" : "";
+	    DrawButton(...cords, "", "White", checkImage);
+	    DrawText(label, cords[0] - 250, cords[1] + 33, "Black", "Gray");
 	}
 
 	settings();

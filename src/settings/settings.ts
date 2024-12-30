@@ -13,7 +13,7 @@ export const defaultSettings: Settings = {
     replyBackgroundColor: "#D3D3D3",
     replyTextColor: "#000000",
     enableCustomFocusColor: true,
-    customFocusColor: "red"
+    customFocusColor: "#FF0000"
 }
 
 let BCAPlayerInfos: BCAPlayerInfos = {
