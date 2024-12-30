@@ -27,12 +27,26 @@
 	    repository: MOD_REPOSITORY,
 	});
 
+	const constants = {
+	    //ReplyContent.isReplyMessage
+	    IS_REPLY_MESSAGE: "isReplyMessage",
+	    InputChat_DIV_ID: "InputChat",
+	    //InputChat placeholder
+	    TALK_TO_EVERYONE_PLACEHOLDER: "Talk to everyone",
+	    //close button id
+	    CHAT_ROOM_REPLY_CLOSE: "chat-room-reply-close",
+	    //chat container class
+	    TEXT_AREA_CHAT_LOG: '#TextAreaChatLog',
+	    //last message div
+	    CHAT_MESSAGE_CHAT_LAST_OF_TYPE: ".ChatMessageChat:last-of-type"
+	};
+
 	let isReplyMode = false;
+	let isWaitingForReply = false;
 	function reply() {
 	    mod.hookFunction("ChatRoomMessage", 1, (args, next) => {
+	        isWaitingForReply = true;
 	        next(args);
-	        console.log(args);
-	        console.log("ChatroomMessage");
 	        if (args[0] && args[0].Type && args[0].Type == "Chat") {
 	            let chatMessage = args[0];
 	            if (chatMessage.Content && chatMessage.Sender) {
@@ -40,7 +54,7 @@
 	            }
 	            // @ts-ignore
 	            let replyMessageData = chatMessage.Dictionary.find(obj => {
-	                if (obj["isReplyMessage"] && obj["isReplyMessage"] == true) {
+	                if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
 	                    return obj;
 	                }
 	                return false;
@@ -61,50 +75,63 @@
 	            if (isReplyMode) {
 	                args[1]["Dictionary"].push(replyMessageData);
 	            }
-	        }
-	        next(args);
-	        if (args[1] && args[1]["Content"] && args[1]["Type"] == "Chat") {
+	            next(args);
 	            isReplyMode = false;
-	            const chatInput = document.getElementById("InputChat");
-	            chatInput.placeholder = "Talk to everyone";
+	            const chatInput = document.getElementById(constants.InputChat_DIV_ID);
+	            if (chatInput) {
+	                chatInput.placeholder = constants.TALK_TO_EVERYONE_PLACEHOLDER;
+	            }
+	            const closeButtonHtml = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE);
+	            if (closeButtonHtml) {
+	                closeButtonHtml.remove();
+	            }
+	        }
+	        else {
+	            next(args);
 	        }
 	    });
 	    mod.hookFunction("ElementScrollToEnd", 1, (args, next) => {
-	        setTimeout(() => {
+	        if (isWaitingForReply) {
+	            setTimeout(() => {
+	                next(args);
+	                isWaitingForReply = false;
+	            }, 1);
+	        }
+	        else {
 	            next(args);
-	        }, 1);
+	        }
 	    });
 	}
 	let repliedMessage = "";
 	let repliedMessageAuthor;
 	let repliedMessageAuthorNumber;
 	function addButtonToLastMessage(messageText, messageSenderNumber) {
-	    const chatContainer = document.querySelector('#TextAreaChatLog');
+	    const chatContainer = document.querySelector(constants.TEXT_AREA_CHAT_LOG);
 	    let lastMessage = null;
 	    if (chatContainer) {
-	        lastMessage = chatContainer.querySelector('.ChatMessageChat:last-of-type');
+	        lastMessage = chatContainer.querySelector(constants.CHAT_MESSAGE_CHAT_LAST_OF_TYPE);
 	    }
 	    if (lastMessage) {
 	        const userNameDiv = lastMessage.querySelector('.ChatMessageName');
 	        const userName = userNameDiv.innerText;
 	        let button = ElementButton.Create(null, function (ev) {
-	            const closeButtonHtml = document.getElementById("chat-room-reply-close");
+	            const closeButtonHtml = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE);
 	            repliedMessage = messageText;
 	            repliedMessageAuthor = userName;
 	            repliedMessageAuthorNumber = messageSenderNumber;
-	            const chatInput = document.getElementById("InputChat");
+	            const chatInput = document.getElementById(constants.InputChat_DIV_ID);
 	            //chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
 	            isReplyMode = true;
 	            chatInput.placeholder = "Reply to " + repliedMessageAuthor;
 	            chatInput.focus();
 	            if (!closeButtonHtml) {
-	                const closeButton = ElementButton.Create("chat-room-reply-close", () => {
+	                const closeButton = ElementButton.Create(constants.CHAT_ROOM_REPLY_CLOSE, () => {
 	                    isReplyMode = false;
-	                    chatInput.placeholder = "Talk to everyone";
+	                    chatInput.placeholder = constants.TALK_TO_EVERYONE_PLACEHOLDER;
 	                    repliedMessage = "";
 	                    repliedMessageAuthor = "";
 	                    repliedMessageAuthorNumber = null;
-	                    const closeButtonHtmlAfterClick = document.getElementById("chat-room-reply-close");
+	                    const closeButtonHtmlAfterClick = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE);
 	                    closeButtonHtmlAfterClick.remove();
 	                    collapseButton.setAttribute("aria-expanded", "false");
 	                    collapseButton.textContent = "<";
@@ -120,8 +147,6 @@
 	        }, 
 	        // @ts-ignore
 	        { noStyling: true }, { button: { classList: ["ChatReplyButton"], children: [" \u21a9\ufe0f"] } });
-	        button.classList.add('ChatReplyButton');
-	        button.style.display = "none";
 	        lastMessage.onmouseenter = () => {
 	            button.style.display = "inline-block";
 	        };
@@ -136,10 +161,10 @@
 	        const replyDiv = ElementCreateDiv("replyMessageDiv" + new Date().getTime());
 	        replyDiv.textContent = messageSender + ": " + messageText;
 	        replyDiv.classList.add("ChatReplyBox");
-	        const chatContainer = document.querySelector('#TextAreaChatLog');
+	        const chatContainer = document.querySelector(constants.TEXT_AREA_CHAT_LOG);
 	        let lastMessage = null;
 	        if (chatContainer) {
-	            lastMessage = chatContainer.querySelector('.ChatMessageChat:last-of-type');
+	            lastMessage = chatContainer.querySelector(constants.CHAT_MESSAGE_CHAT_LAST_OF_TYPE);
 	        }
 	        if (lastMessage) {
 	            lastMessage.prepend(replyDiv);
@@ -187,6 +212,7 @@
         display: inline;
         cursor: pointer;
         font-size: smaller;
+        display: none;
     }
     `;
 	    document.head.appendChild(style);

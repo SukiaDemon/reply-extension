@@ -1,14 +1,15 @@
 import {mod} from "mod";
 import {ReplyContent} from "../models/replyContent";
+import constants from "../utils/constants";
 
 export let isReplyMode: boolean = false;
+export let isWaitingForReply: boolean = false
 
 export default function reply() {
 
     mod.hookFunction("ChatRoomMessage", 1, (args, next) => {
+        isWaitingForReply = true;
         next(args)
-        console.log(args)
-        console.log("ChatroomMessage")
         if (args[0] && args[0].Type && args[0].Type == "Chat") {
             let chatMessage = args[0];
             if (chatMessage.Content && chatMessage.Sender) {
@@ -17,7 +18,7 @@ export default function reply() {
 
             // @ts-ignore
             let replyMessageData: ReplyContent = chatMessage.Dictionary.find(obj => {
-                if (obj["isReplyMessage"] && obj["isReplyMessage"] == true) {
+                if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
                     return obj as unknown as ReplyContent;
                 }
                 return false;
@@ -37,24 +38,38 @@ export default function reply() {
             repliedMessage: repliedMessage,
             repliedMessageAuthor: repliedMessageAuthor
         };
-
         if (args[1] && args[1]["Content"] && args[1]["Type"] == "Chat") {
             if (isReplyMode) {
                 args[1]["Dictionary"].push(replyMessageData);
             }
-        }
-        next(args);
-        if (args[1] && args[1]["Content"] && args[1]["Type"] == "Chat") {
+
+            next(args);
             isReplyMode = false;
-            const chatInput: HTMLTextAreaElement | null = document.getElementById("InputChat") as HTMLTextAreaElement | null;
-            chatInput.placeholder = "Talk to everyone"
+
+            const chatInput: HTMLTextAreaElement | null = document.getElementById(constants.InputChat_DIV_ID) as HTMLTextAreaElement | null;
+            if (chatInput) {
+                chatInput.placeholder = constants.TALK_TO_EVERYONE_PLACEHOLDER;
+            }
+
+            const closeButtonHtml = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE) as HTMLElement;
+            if (closeButtonHtml) {
+                closeButtonHtml.remove();
+            }
+
+        } else {
+            next(args);
         }
-    })
+    });
 
     mod.hookFunction("ElementScrollToEnd", 1, (args, next) => {
-        setTimeout(() => {
+        if (isWaitingForReply) {
+            setTimeout(() => {
+                next(args)
+                isWaitingForReply = false;
+            }, 1);
+        } else {
             next(args)
-        }, 1);
+        }
     })
 
 }
@@ -64,11 +79,11 @@ export let repliedMessageAuthor: string
 export let repliedMessageAuthorNumber: number
 
 function addButtonToLastMessage(messageText: string, messageSenderNumber: number) {
-    const chatContainer = document.querySelector('#TextAreaChatLog');
+    const chatContainer = document.querySelector(constants.TEXT_AREA_CHAT_LOG);
     let lastMessage = null;
 
     if (chatContainer) {
-        lastMessage = chatContainer.querySelector('.ChatMessageChat:last-of-type');
+        lastMessage = chatContainer.querySelector(constants.CHAT_MESSAGE_CHAT_LAST_OF_TYPE);
     }
 
     if (lastMessage) {
@@ -80,13 +95,13 @@ function addButtonToLastMessage(messageText: string, messageSenderNumber: number
             null,
             function (this: HTMLButtonElement, ev: MouseEvent | TouchEvent) {
 
-                const closeButtonHtml = document.getElementById("chat-room-reply-close") as HTMLElement
+                const closeButtonHtml = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE) as HTMLElement
 
                 repliedMessage = messageText;
                 repliedMessageAuthor = userName;
                 repliedMessageAuthorNumber = messageSenderNumber;
 
-                const chatInput: HTMLTextAreaElement | null = document.getElementById("InputChat") as HTMLTextAreaElement | null;
+                const chatInput: HTMLTextAreaElement | null = document.getElementById(constants.InputChat_DIV_ID) as HTMLTextAreaElement | null;
                 //chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
                 isReplyMode = true;
                 chatInput.placeholder = "Reply to " + repliedMessageAuthor;
@@ -94,13 +109,13 @@ function addButtonToLastMessage(messageText: string, messageSenderNumber: number
 
                 if (!closeButtonHtml) {
                     const closeButton = ElementButton.Create(
-                        "chat-room-reply-close", () => {
+                        constants.CHAT_ROOM_REPLY_CLOSE, () => {
                             isReplyMode = false;
-                            chatInput.placeholder = "Talk to everyone"
+                            chatInput.placeholder = constants.TALK_TO_EVERYONE_PLACEHOLDER
                             repliedMessage = "";
                             repliedMessageAuthor = "";
                             repliedMessageAuthorNumber = null;
-                            const closeButtonHtmlAfterClick = document.getElementById("chat-room-reply-close") as HTMLElement
+                            const closeButtonHtmlAfterClick = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE) as HTMLElement
                             closeButtonHtmlAfterClick.remove();
                             collapseButton.setAttribute("aria-expanded", "false");
                             collapseButton.textContent = "<"
@@ -120,8 +135,6 @@ function addButtonToLastMessage(messageText: string, messageSenderNumber: number
             {noStyling: true},
             {button: {classList: ["ChatReplyButton"], children: [" \u21a9\ufe0f"]}}
         )
-        button.classList.add('ChatReplyButton');
-        button.style.display = "none";
         lastMessage.onmouseenter = () => {
             button.style.display = "inline-block";
         };
@@ -140,11 +153,11 @@ function addReplyBoxToLastMessage(messageText: string, messageSender: string) {
         replyDiv.textContent = messageSender + ": " + messageText;
         replyDiv.classList.add("ChatReplyBox");
 
-        const chatContainer = document.querySelector('#TextAreaChatLog');
+        const chatContainer = document.querySelector(constants.TEXT_AREA_CHAT_LOG);
         let lastMessage = null;
 
         if (chatContainer) {
-            lastMessage = chatContainer.querySelector('.ChatMessageChat:last-of-type');
+            lastMessage = chatContainer.querySelector(constants.CHAT_MESSAGE_CHAT_LAST_OF_TYPE);
 
         }
 
