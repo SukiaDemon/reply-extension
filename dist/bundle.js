@@ -96,6 +96,8 @@
                 color: var(--reply-text-color);
                 padding: 5px;
                 border-radius: 4px;
+                position: relative;
+                padding-left: 0.4em;
              }
         `;
 	    document.head.appendChild(style);
@@ -251,7 +253,7 @@
 	            lastMessage = chatContainer.querySelector(constants.CHAT_MESSAGE_CHAT_LAST_OF_TYPE);
 	        }
 	        if (lastMessage) {
-	            lastMessage.prepend(replyDiv);
+	            chatContainer.insertBefore(replyDiv, lastMessage);
 	        }
 	    }
 	}

@@ -57,6 +57,8 @@ function chatReplyBoxCss() {
                 color: var(--reply-text-color);
                 padding: 5px;
                 border-radius: 4px;
+                position: relative;
+                padding-left: 0.4em;
              }
         `;
     document.head.appendChild(style);

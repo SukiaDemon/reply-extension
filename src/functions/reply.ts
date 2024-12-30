@@ -167,11 +167,10 @@ function addReplyBoxToLastMessage(messageText: string, messageSender: string) {
 
         if (chatContainer) {
             lastMessage = chatContainer.querySelector(constants.CHAT_MESSAGE_CHAT_LAST_OF_TYPE);
-
         }
 
         if (lastMessage) {
-            lastMessage.prepend(replyDiv);
+            chatContainer.insertBefore(replyDiv, lastMessage);
         }
     }
 
