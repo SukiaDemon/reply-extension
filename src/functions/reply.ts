@@ -1,6 +1,7 @@
 import {mod} from "mod";
 import {ReplyContent} from "../models/replyContent";
 import constants from "../utils/constants";
+import {customFocusColor} from "../css/css";
 
 export let isReplyMode: boolean = false;
 export let isWaitingForReply: boolean = false
@@ -45,6 +46,7 @@ export default function reply() {
 
             next(args);
             isReplyMode = false;
+            customFocusColor.disable();
 
             const chatInput: HTMLTextAreaElement | null = document.getElementById(constants.InputChat_DIV_ID) as HTMLTextAreaElement | null;
             if (chatInput) {
@@ -93,7 +95,7 @@ function addButtonToLastMessage(messageText: string, messageSenderNumber: number
 
         let button = ElementButton.Create(
             null,
-            function (this: HTMLButtonElement, ev: MouseEvent | TouchEvent) {
+            () => {
 
                 const closeButtonHtml = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE) as HTMLElement
 
@@ -105,12 +107,19 @@ function addButtonToLastMessage(messageText: string, messageSenderNumber: number
                 //chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
                 isReplyMode = true;
                 chatInput.placeholder = "Reply to " + repliedMessageAuthor;
+
+                if (Player.ExtensionSettings.BCA.settings.enableCustomFocusColor) {
+                    customFocusColor.enable(Player.ExtensionSettings.BCA.settings.customFocusColor);
+                }
                 chatInput.focus();
 
                 if (!closeButtonHtml) {
                     const closeButton = ElementButton.Create(
                         constants.CHAT_ROOM_REPLY_CLOSE, () => {
                             isReplyMode = false;
+                            if (Player.ExtensionSettings.BCA.settings.enableCustomFocusColor) {
+                                customFocusColor.disable();
+                            }
                             chatInput.placeholder = constants.TALK_TO_EVERYONE_PLACEHOLDER
                             repliedMessage = "";
                             repliedMessageAuthor = "";

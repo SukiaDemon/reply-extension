@@ -1,23 +1,23 @@
 export interface Settings {
     replyBackgroundColor: string,
-    replyTextColor: string
+    replyTextColor: string,
+    enableCustomFocusColor: boolean,
+    customFocusColor: string,
 }
 
 export interface BCAPlayerInfos {
     settings: Settings
-    targetUser: string,
-    repliedMessage: string
 }
 
 export const defaultSettings: Settings = {
     replyBackgroundColor: "#D3D3D3",
-    replyTextColor: "#000000"
+    replyTextColor: "#000000",
+    enableCustomFocusColor: true,
+    customFocusColor: "red"
 }
 
 let BCAPlayerInfos: BCAPlayerInfos = {
     settings: {...defaultSettings},
-    targetUser: "",
-    repliedMessage: ""
 }
 
 export function settings() {

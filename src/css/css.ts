@@ -1,5 +1,25 @@
 import replyCloseButton from '../img/Remove.png'
 
+export let customFocusColor = {
+    enable: (color: string) => {
+        const chatroomBot = document.getElementById("chat-room-bot") as HTMLTextAreaElement | null;
+        if (chatroomBot) {
+            chatroomBot.style.outline = "none";
+            chatroomBot.style.border = `2px solid ${color}`;
+            chatroomBot.style.boxShadow = "0 0 10px #719ECE";
+        }
+    },
+    disable: () => {
+        const chatroomBot = document.getElementById("chat-room-bot") as HTMLTextAreaElement | null;
+        if (chatroomBot) {
+            chatroomBot.style.outline = "";
+            chatroomBot.style.border = "";
+            chatroomBot.style.boxShadow = "";
+        }
+    }
+}
+
+
 export function loadCss() {
     chatReplyButtonCss();
     chatReplyBoxCss();
