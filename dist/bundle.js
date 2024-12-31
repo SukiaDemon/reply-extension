@@ -175,7 +175,7 @@
 	            setTimeout(() => {
 	                next(args);
 	                isWaitingForReply = false;
-	            }, 1);
+	            }, 100);
 	        }
 	        else {
 	            next(args);
