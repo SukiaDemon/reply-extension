@@ -243,6 +243,10 @@
 	function addReplyBoxToLastMessage(messageText, messageSender) {
 	    if (messageText && messageSender) {
 	        const replyDiv = ElementCreateDiv("replyMessageDiv" + new Date().getTime());
+	        const maxLength = 100;
+	        if (messageText.length >= maxLength) {
+	            messageText = messageText.slice(0, maxLength) + "...";
+	        }
 	        replyDiv.textContent = messageSender + ": " + messageText;
 	        replyDiv.classList.add("ChatReplyBox");
 	        const chatContainer = document.querySelector(constants.TEXT_AREA_CHAT_LOG);
