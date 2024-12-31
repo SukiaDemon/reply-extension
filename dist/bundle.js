@@ -124,13 +124,8 @@
 	let isWaitingForReply = false;
 	function reply() {
 	    mod.hookFunction("ChatRoomMessage", 1, (args, next) => {
-	        isWaitingForReply = true;
-	        next(args);
 	        if (args[0] && args[0].Type && args[0].Type == "Chat") {
 	            let chatMessage = args[0];
-	            if (chatMessage.Content && chatMessage.Sender) {
-	                addButtonToLastMessage(args[0].Content, args[0].Sender);
-	            }
 	            // @ts-ignore
 	            let replyMessageData = chatMessage.Dictionary.find(obj => {
 	                if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
@@ -139,9 +134,36 @@
 	                return false;
 	            });
 	            if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
+	                isWaitingForReply = true;
+	            }
+	            next(args);
+	            if (chatMessage.Content && chatMessage.Sender) {
+	                addButtonToLastMessage(args[0].Content, args[0].Sender);
+	            }
+	            if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
 	                addReplyBoxToLastMessage(replyMessageData.repliedMessage, replyMessageData.repliedMessageAuthor);
 	            }
 	        }
+	        /*isWaitingForReply = true;
+	        next(args)
+	        if (args[0] && args[0].Type && args[0].Type == "Chat") {
+	            let chatMessage = args[0];
+	            if (chatMessage.Content && chatMessage.Sender) {
+	                addButtonToLastMessage(args[0].Content, args[0].Sender);
+	            }
+
+	            // @ts-ignore
+	            let replyMessageData: ReplyContent = chatMessage.Dictionary.find(obj => {
+	                if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
+	                    return obj as unknown as ReplyContent;
+	                }
+	                return false;
+	            });
+
+	            if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
+	                addReplyBoxToLastMessage(replyMessageData.repliedMessage, replyMessageData.repliedMessageAuthor)
+	            }
+	        }*/
 	    });
 	    mod.hookFunction("ServerSend", 1, (args, next) => {
 	        let replyMessageData = {
@@ -170,12 +192,11 @@
 	            next(args);
 	        }
 	    });
-	    mod.hookFunction("ElementScrollToEnd", 1, (args, next) => {
+	    mod.hookFunction("ElementScrollToEnd", 1, async (args, next) => {
 	        if (isWaitingForReply) {
-	            setTimeout(() => {
-	                next(args);
-	                isWaitingForReply = false;
-	            }, 100);
+	            console.log("yes");
+	            await waitFor(() => !!addReplyBoxToLastMessage);
+	            next(args);
 	        }
 	        next(args);
 	    });
@@ -257,7 +278,22 @@
 	        if (lastMessage) {
 	            chatContainer.insertBefore(replyDiv, lastMessage);
 	        }
+	        isWaitingForReply = false;
 	    }
+	}
+	function sleep(ms) {
+	    // eslint-disable-next-line no-promise-executor-return
+	    return new Promise(resolve => window.setTimeout(resolve, ms));
+	}
+	async function waitFor(func, cancelFunc = () => false) {
+	    while (!func()) {
+	        if (cancelFunc()) {
+	            return false;
+	        }
+	        // eslint-disable-next-line no-await-in-loop
+	        await sleep(10);
+	    }
+	    return true;
 	}
 
 	function commands() {
@@ -299,7 +335,8 @@
 	    }
 	}
 
-	function settingsPage() {
+	async function settingsPage() {
+	    await waitFor(() => !!PreferenceSubscreenList);
 	    let hideBackGroundColorPicker = true;
 	    let hideTextColorPicker = true;
 	    let hideCustomFocusColorPicker = true;

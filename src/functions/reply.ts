@@ -9,13 +9,9 @@ export let isWaitingForReply: boolean = false
 export default function reply() {
 
     mod.hookFunction("ChatRoomMessage", 1, (args, next) => {
-        isWaitingForReply = true;
-        next(args)
+
         if (args[0] && args[0].Type && args[0].Type == "Chat") {
             let chatMessage = args[0];
-            if (chatMessage.Content && chatMessage.Sender) {
-                addButtonToLastMessage(args[0].Content, args[0].Sender);
-            }
 
             // @ts-ignore
             let replyMessageData: ReplyContent = chatMessage.Dictionary.find(obj => {
@@ -26,10 +22,21 @@ export default function reply() {
             });
 
             if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
+                isWaitingForReply = true;
+            }
+
+            next(args)
+
+            if (chatMessage.Content && chatMessage.Sender) {
+                addButtonToLastMessage(args[0].Content, args[0].Sender);
+            }
+
+            if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
                 addReplyBoxToLastMessage(replyMessageData.repliedMessage, replyMessageData.repliedMessageAuthor)
             }
-        }
 
+        }
+        
     })
 
     mod.hookFunction("ServerSend", 1, (args, next) => {
@@ -63,12 +70,10 @@ export default function reply() {
         }
     });
 
-    mod.hookFunction("ElementScrollToEnd", 1, (args, next) => {
+    mod.hookFunction("ElementScrollToEnd", 1, async (args, next) => {
         if (isWaitingForReply) {
-            setTimeout(() => {
-                next(args)
-                isWaitingForReply = false;
-            }, 100);
+            await waitFor(() => !!addReplyBoxToLastMessage);
+            next(args)
         }
         next(args)
     })
@@ -176,6 +181,24 @@ function addReplyBoxToLastMessage(messageText: string, messageSender: string) {
         if (lastMessage) {
             chatContainer.insertBefore(replyDiv, lastMessage);
         }
+
+        isWaitingForReply = false;
     }
 
+}
+
+export function sleep(ms: number): Promise<number> {
+    // eslint-disable-next-line no-promise-executor-return
+    return new Promise(resolve => window.setTimeout(resolve, ms));
+}
+
+export async function waitFor(func: () => boolean, cancelFunc: () => boolean = () => false): Promise<boolean> {
+    while (!func()) {
+        if (cancelFunc()) {
+            return false;
+        }
+        // eslint-disable-next-line no-await-in-loop
+        await sleep(10);
+    }
+    return true;
 }

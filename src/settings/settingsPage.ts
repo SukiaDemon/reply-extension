@@ -1,8 +1,10 @@
 import {defaultSettings} from "./settings";
 import {customFocusColor as customFocusColorCSS} from "../css/css";
-import {isReplyMode} from "../functions/reply";
+import {isReplyMode, waitFor} from "../functions/reply";
 
-export function settingsPage() {
+export async function settingsPage() {
+
+    await waitFor(() => !!PreferenceSubscreenList);
 
     let hideBackGroundColorPicker: boolean = true;
     let hideTextColorPicker: boolean = true;
