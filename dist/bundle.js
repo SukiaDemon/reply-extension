@@ -20,12 +20,16 @@
 	const MOD_FULL_NAME = "Bondage Club Additions";
 	const MOD_VERSION = "0.1.0";
 	const MOD_REPOSITORY = "";
-	const mod = bcModSdk.registerMod({
-	    name: MOD_NAME,
-	    fullName: MOD_FULL_NAME,
-	    version: MOD_VERSION,
-	    repository: MOD_REPOSITORY,
-	});
+	let mod = null;
+	// @ts-ignore
+	if (!window.BCA_VERSION) {
+	    mod = bcModSdk.registerMod({
+	        name: MOD_NAME,
+	        fullName: MOD_FULL_NAME,
+	        version: MOD_VERSION,
+	        repository: MOD_REPOSITORY,
+	    });
+	}
 
 	const constants = {
 	    //ReplyContent.isReplyMessage
@@ -120,6 +124,21 @@
 	    document.head.appendChild(style);
 	}
 
+	function sleep(ms) {
+	    // eslint-disable-next-line no-promise-executor-return
+	    return new Promise(resolve => window.setTimeout(resolve, ms));
+	}
+	async function waitFor(func, cancelFunc = () => false) {
+	    while (!func()) {
+	        if (cancelFunc()) {
+	            return false;
+	        }
+	        // eslint-disable-next-line no-await-in-loop
+	        await sleep(10);
+	    }
+	    return true;
+	}
+
 	let isReplyMode = false;
 	let isWaitingForReply = false;
 	function reply() {
@@ -144,26 +163,6 @@
 	                addReplyBoxToLastMessage(replyMessageData.repliedMessage, replyMessageData.repliedMessageAuthor);
 	            }
 	        }
-	        /*isWaitingForReply = true;
-	        next(args)
-	        if (args[0] && args[0].Type && args[0].Type == "Chat") {
-	            let chatMessage = args[0];
-	            if (chatMessage.Content && chatMessage.Sender) {
-	                addButtonToLastMessage(args[0].Content, args[0].Sender);
-	            }
-
-	            // @ts-ignore
-	            let replyMessageData: ReplyContent = chatMessage.Dictionary.find(obj => {
-	                if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
-	                    return obj as unknown as ReplyContent;
-	                }
-	                return false;
-	            });
-
-	            if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
-	                addReplyBoxToLastMessage(replyMessageData.repliedMessage, replyMessageData.repliedMessageAuthor)
-	            }
-	        }*/
 	    });
 	    mod.hookFunction("ServerSend", 1, (args, next) => {
 	        let replyMessageData = {
@@ -194,7 +193,6 @@
 	    });
 	    mod.hookFunction("ElementScrollToEnd", 1, async (args, next) => {
 	        if (isWaitingForReply) {
-	            console.log("yes");
 	            await waitFor(() => !!addReplyBoxToLastMessage);
 	            next(args);
 	        }
@@ -281,20 +279,6 @@
 	        isWaitingForReply = false;
 	    }
 	}
-	function sleep(ms) {
-	    // eslint-disable-next-line no-promise-executor-return
-	    return new Promise(resolve => window.setTimeout(resolve, ms));
-	}
-	async function waitFor(func, cancelFunc = () => false) {
-	    while (!func()) {
-	        if (cancelFunc()) {
-	            return false;
-	        }
-	        // eslint-disable-next-line no-await-in-loop
-	        await sleep(10);
-	    }
-	    return true;
-	}
 
 	function commands() {
 	    CommandCombine({
@@ -333,6 +317,8 @@
 	    if (!Player.ExtensionSettings.BCA) {
 	        Player.ExtensionSettings.BCA = BCAPlayerInfos;
 	    }
+	    // @ts-ignore
+	    window.BCA_VERSION = "0.1.0";
 	}
 
 	async function settingsPage() {
@@ -466,10 +452,24 @@
 	    DrawText(label, cords[0] - 250, cords[1] + 33, "Black", "Gray");
 	}
 
-	settings();
-	settingsPage();
-	loadCss();
-	commands();
-	reply();
+	BCAStart().catch((error) => {
+	    console.log(error);
+	});
+	async function BCAStart() {
+	    // @ts-ignore
+	    await waitFor(() => ServerIsConnected && ServerSocket);
+	    await waitFor(() => !!!!Player?.AccountName);
+	    // @ts-ignore
+	    if (!window.BCA_VERSION) {
+	        settings();
+	        await settingsPage();
+	        loadCss();
+	        commands();
+	        reply();
+	    }
+	    else {
+	        console.log("BCA is already loaded!");
+	    }
+	}
 
 })();

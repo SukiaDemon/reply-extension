@@ -1,6 +1,7 @@
 import {defaultSettings} from "./settings";
 import {customFocusColor as customFocusColorCSS} from "../css/css";
-import {isReplyMode, waitFor} from "../functions/reply";
+import {isReplyMode} from "../functions/reply";
+import {waitFor} from "../functions/utils";
 
 export async function settingsPage() {
 

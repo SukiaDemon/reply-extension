@@ -2,6 +2,7 @@ import {mod} from "mod";
 import {ReplyContent} from "../models/replyContent";
 import constants from "../utils/constants";
 import {customFocusColor} from "../css/css";
+import {waitFor} from "./utils";
 
 export let isReplyMode: boolean = false;
 export let isWaitingForReply: boolean = false
@@ -36,7 +37,7 @@ export default function reply() {
             }
 
         }
-        
+
     })
 
     mod.hookFunction("ServerSend", 1, (args, next) => {
@@ -185,20 +186,4 @@ function addReplyBoxToLastMessage(messageText: string, messageSender: string) {
         isWaitingForReply = false;
     }
 
-}
-
-export function sleep(ms: number): Promise<number> {
-    // eslint-disable-next-line no-promise-executor-return
-    return new Promise(resolve => window.setTimeout(resolve, ms));
-}
-
-export async function waitFor(func: () => boolean, cancelFunc: () => boolean = () => false): Promise<boolean> {
-    while (!func()) {
-        if (cancelFunc()) {
-            return false;
-        }
-        // eslint-disable-next-line no-await-in-loop
-        await sleep(10);
-    }
-    return true;
 }
