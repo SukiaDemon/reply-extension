@@ -1,4 +1,11 @@
 const constants = {
+
+    //Mod infos
+    MOD_NAME: "BCA",
+    MOD_FULL_NAME: "Bondage Club Additions",
+    MOD_VERSION: "0.1.0",
+    MOD_REPOSITORY: "",
+
     //ReplyContent.isReplyMessage
     IS_REPLY_MESSAGE: "isReplyMessage",
     InputChat_DIV_ID: "InputChat",

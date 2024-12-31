@@ -1,3 +1,5 @@
+import constants from "../utils/constants";
+
 export interface Settings {
     replyBackgroundColor: string,
     replyTextColor: string,
@@ -26,5 +28,5 @@ export function settings() {
     }
 
     // @ts-ignore
-    window.BCA_VERSION = "0.1.0"
+    window.BCA_VERSION = constants.MOD_VERSION;
 }
