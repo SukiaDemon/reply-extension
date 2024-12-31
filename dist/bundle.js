@@ -177,9 +177,7 @@
 	                isWaitingForReply = false;
 	            }, 100);
 	        }
-	        else {
-	            next(args);
-	        }
+	        next(args);
 	    });
 	}
 	let repliedMessage = "";

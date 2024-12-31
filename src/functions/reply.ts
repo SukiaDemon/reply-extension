@@ -69,9 +69,8 @@ export default function reply() {
                 next(args)
                 isWaitingForReply = false;
             }, 100);
-        } else {
-            next(args)
         }
+        next(args)
     })
 
 }
