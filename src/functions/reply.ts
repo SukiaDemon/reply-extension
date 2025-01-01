@@ -36,8 +36,9 @@ export default function reply() {
                 addReplyBoxToLastMessage(replyMessageData.repliedMessage, replyMessageData.repliedMessageAuthor)
             }
 
+        } else {
+            next(args);
         }
-
     })
 
     mod.hookFunction("ServerSend", 1, (args, next) => {

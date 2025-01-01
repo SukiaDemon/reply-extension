@@ -17,6 +17,7 @@
 	var bcModSdk = /*@__PURE__*/getDefaultExportFromCjs(bcmodsdk);
 
 	const constants = {
+	    //Mod infos
 	    MOD_NAME: "BCA",
 	    MOD_FULL_NAME: "Bondage Club Additions",
 	    MOD_VERSION: "0.1.0",
@@ -166,6 +167,9 @@
 	            if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
 	                addReplyBoxToLastMessage(replyMessageData.repliedMessage, replyMessageData.repliedMessageAuthor);
 	            }
+	        }
+	        else {
+	            next(args);
 	        }
 	    });
 	    mod.hookFunction("ServerSend", 1, (args, next) => {
@@ -470,6 +474,7 @@
 	        loadCss();
 	        commands();
 	        reply();
+	        console.log("BCA loaded!");
 	    }
 	    else {
 	        console.log("BCA is already loaded!");
