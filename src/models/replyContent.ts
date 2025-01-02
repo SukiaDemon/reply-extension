@@ -1,5 +1,6 @@
 export interface ReplyContent {
-    targetId?: string
-    targetUser: string,
+    isReplyMessage: boolean,
+    targetId?: number,
+    repliedMessageAuthor: string,
     repliedMessage: string
 }

@@ -1,6 +1,29 @@
+import replyCloseButton from '../img/Remove.png'
+
+export let customFocusColor = {
+    enable: (color: string) => {
+        const chatroomBot = document.getElementById("chat-room-bot") as HTMLTextAreaElement | null;
+        if (chatroomBot) {
+            chatroomBot.style.outline = "none";
+            chatroomBot.style.border = `2px solid ${color}`;
+            chatroomBot.style.boxShadow = "0 0 10px #719ECE";
+        }
+    },
+    disable: () => {
+        const chatroomBot = document.getElementById("chat-room-bot") as HTMLTextAreaElement | null;
+        if (chatroomBot) {
+            chatroomBot.style.outline = "";
+            chatroomBot.style.border = "";
+            chatroomBot.style.boxShadow = "";
+        }
+    }
+}
+
+
 export function loadCss() {
     chatReplyButtonCss();
     chatReplyBoxCss();
+    chatReplyClose();
 }
 
 function chatReplyButtonCss() {
@@ -12,6 +35,7 @@ function chatReplyButtonCss() {
         display: inline;
         cursor: pointer;
         font-size: smaller;
+        display: none;
     }
     `;
     document.head.appendChild(style);
@@ -33,7 +57,27 @@ function chatReplyBoxCss() {
                 color: var(--reply-text-color);
                 padding: 5px;
                 border-radius: 4px;
+                position: relative;
+                padding-left: 0.4em;
              }
+        `;
+    document.head.appendChild(style);
+}
+
+function chatReplyClose() {
+    const style = document.createElement("style");
+    style.innerHTML =
+        `
+            #chat-room-reply-close::before {
+            background-image: url("${replyCloseButton}");
+            mask-image: url("${replyCloseButton}");
+            transition: filter 0.3s ease;
+        }
+        
+            #chat-room-reply-close:hover::before {
+            filter: brightness(0) saturate(100%) invert(42%) sepia(100%) saturate(2968%) hue-rotate(179deg) brightness(106%) contrast(101%);
+        }
+        
         `;
     document.head.appendChild(style);
 }
