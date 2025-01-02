@@ -28,6 +28,6 @@ async function BCAStart() {
         reply();
         console.log("BCA loaded!")
     } else {
-        console.log("BCA is already loaded!!")
+        console.log("BCA is already loaded!")
     }
 }
