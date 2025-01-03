@@ -214,8 +214,8 @@
 
     const constants = {
         //Mod infos
-        MOD_NAME: "BCA",
-        MOD_FULL_NAME: "Bondage Club Additions",
+        MOD_NAME: "BCR",
+        MOD_FULL_NAME: "Bondage Club Reply Extension",
         MOD_VERSION: "0.1.0",
         MOD_REPOSITORY: "",
         //ReplyContent.isReplyMessage
@@ -237,7 +237,7 @@
     const MOD_REPOSITORY = "";*/
     let mod = null;
     // @ts-ignore
-    if (!window.BCA_VERSION) {
+    if (!window.BCR_VERSION) {
         mod = bcModSdk.registerMod({
             name: constants.MOD_NAME,
             fullName: constants.MOD_FULL_NAME,
@@ -293,8 +293,8 @@
         style.innerHTML =
             `
             :root {
-                --reply-background-color: ${Player.ExtensionSettings.BCA.settings.replyBackgroundColor};
-                --reply-text-color: ${Player.ExtensionSettings.BCA.settings.replyTextColor};
+                --reply-background-color: ${Player.ExtensionSettings.BCR.settings.replyBackgroundColor};
+                --reply-text-color: ${Player.ExtensionSettings.BCR.settings.replyTextColor};
             }
 
             .ChatReplyBox {
@@ -429,15 +429,19 @@
                     const chatInput = document.getElementById(constants.InputChat_DIV_ID);
                     //chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
                     isReplyMode = true;
-                    chatInput.placeholder = "Reply to " + repliedMessageAuthor;
-                    if (Player.ExtensionSettings.BCA.settings.enableCustomFocusColor) {
-                        customFocusColor.enable(Player.ExtensionSettings.BCA.settings.customFocusColor);
+                    let placeholderText = messageText;
+                    if (messageText.length > 10) {
+                        placeholderText = placeholderText.slice(0, 10) + "...";
+                    }
+                    chatInput.placeholder = "Reply to " + repliedMessageAuthor + ": " + placeholderText;
+                    if (Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
+                        customFocusColor.enable(Player.ExtensionSettings.BCR.settings.customFocusColor);
                     }
                     chatInput.focus();
                     if (!closeButtonHtml) {
                         const closeButton = ElementButton.Create(constants.CHAT_ROOM_REPLY_CLOSE, () => {
                                 isReplyMode = false;
-                                if (Player.ExtensionSettings.BCA.settings.enableCustomFocusColor) {
+                                if (Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
                                     customFocusColor.disable();
                                 }
                                 chatInput.placeholder = constants.TALK_TO_EVERYONE_PLACEHOLDER;
@@ -521,16 +525,16 @@
         enableCustomFocusColor: true,
         customFocusColor: "#FF0000"
     };
-    let BCAPlayerInfos = {
+    let BCRPlayerInfos = {
         settings: {...defaultSettings},
     };
 
     function settings() {
-        if (!Player.ExtensionSettings.BCA) {
-            Player.ExtensionSettings.BCA = BCAPlayerInfos;
+        if (!Player.ExtensionSettings.BCR) {
+            Player.ExtensionSettings.BCR = BCRPlayerInfos;
         }
         // @ts-ignore
-        window.BCA_VERSION = constants.MOD_VERSION;
+        window.BCR_VERSION = constants.MOD_VERSION;
     }
 
     async function settingsPage() {
@@ -539,30 +543,30 @@
         let hideTextColorPicker = true;
         let hideCustomFocusColorPicker = true;
         PreferenceRegisterExtensionSetting({
-            Identifier: "BCA",
-            ButtonText: "BCA Settings",
+            Identifier: "BCR",
+            ButtonText: "BCR Settings",
             Image: undefined, // TODO: Need to find/create cool image
-            load: PreferenceSubScreenBCASettingsLoad,
-            click: PreferenceSubScreenBCASettingsClick,
-            run: PreferenceSubScreenBCASettingsRun,
-            exit: PreferenceSubScreenBCASettingsExit,
+            load: PreferenceSubScreenBCRSettingsLoad,
+            click: PreferenceSubScreenBCRSettingsClick,
+            run: PreferenceSubScreenBCRSettingsRun,
+            exit: PreferenceSubScreenBCRSettingsExit,
         });
 
-        function PreferenceSubScreenBCASettingsLoad() {
+        function PreferenceSubScreenBCRSettingsLoad() {
             //ReplyBoxBackgroundColor Input Field
-            ElementCreateInput("InputReplyBoxBackgroundColor", "text", Player.ExtensionSettings.BCA.settings.replyBackgroundColor);
+            ElementCreateInput("InputReplyBoxBackgroundColor", "text", Player.ExtensionSettings.BCR.settings.replyBackgroundColor);
             //ReplyTextColor Input Field
-            ElementCreateInput("InputReplyTextColor", "text", Player.ExtensionSettings.BCA.settings.replyTextColor);
+            ElementCreateInput("InputReplyTextColor", "text", Player.ExtensionSettings.BCR.settings.replyTextColor);
             //CustomFocusColor Input field
-            ElementCreateInput("InputCustomFocusColor", "text", Player.ExtensionSettings.BCA.settings.customFocusColor);
+            ElementCreateInput("InputCustomFocusColor", "text", Player.ExtensionSettings.BCR.settings.customFocusColor);
             hideBackGroundColorPicker = true;
             hideTextColorPicker = true;
             hideCustomFocusColorPicker = true;
         }
 
-        function PreferenceSubScreenBCASettingsClick() {
+        function PreferenceSubScreenBCRSettingsClick() {
             if (MouseIn(1815, 75, 90, 90)) { //Exit Icon Click
-                PreferenceSubScreenBCASettingsExit();
+                PreferenceSubScreenBCRSettingsExit();
             }
             if (MouseIn(1140, 215, 65, 65)) { //ReplyBoxBackgroundColor Icon Click
                 hideTextColorPicker = true;
@@ -587,11 +591,11 @@
                 ElementValue("InputReplyTextColor", defaultSettings.replyTextColor);
             }
             if (MouseIn(1000, 415, 64, 64)) {
-                Player.ExtensionSettings.BCA.settings.enableCustomFocusColor = !Player.ExtensionSettings.BCA.settings.enableCustomFocusColor;
+                Player.ExtensionSettings.BCR.settings.enableCustomFocusColor = !Player.ExtensionSettings.BCR.settings.enableCustomFocusColor;
             }
         }
 
-        function PreferenceSubScreenBCASettingsRun() {
+        function PreferenceSubScreenBCRSettingsRun() {
             DrawCharacter(Player, 50, 50, 0.9);
             DrawButton(1815, 75, 90, 90, "", "White", "Icons/Exit.png"); //Exit Icon
             DrawText("Reply box background color: ", 630, 250, "Black", "Gray"); //ReplyBoxBackgroundColor Label
@@ -602,7 +606,7 @@
             ElementPosition("InputReplyTextColor", 1000, 350, 250); //ReplyTextColor ColorPicker Position
             DrawButton(1140, 315, 65, 65, "", "White", "Icons/Color.png"); //ReplyTextColor Icon Position
             updateInputFieldTextColor("InputReplyTextColor");
-            addCheckBox([1000, 415, 64, 64], "Enable custom color", Player.ExtensionSettings.BCA.settings.enableCustomFocusColor);
+            addCheckBox([1000, 415, 64, 64], "Enable custom focus color", Player.ExtensionSettings.BCR.settings.enableCustomFocusColor);
             DrawText("Custom chat focus color: ", 660, 550, "Black", "Gray"); //CustomFocusColor Label
             ElementPosition("InputCustomFocusColor", 1000, 550, 250); //CustomFocusColor ColorPicker Position
             DrawButton(1140, 515, 65, 65, "", "White", "Icons/Color.png"); //CustomFocusColor Icon Position
@@ -619,12 +623,12 @@
             DrawButton(600, 715, 300, 100, "Restore to default", "White");
         }
 
-        function PreferenceSubScreenBCASettingsExit() {
+        function PreferenceSubScreenBCRSettingsExit() {
             const ReplyBoxBackgroundColor = ElementValue("InputReplyBoxBackgroundColor");
             const ReplyTextColor = ElementValue("InputReplyTextColor");
             const customFocusColor$1 = ElementValue("InputCustomFocusColor");
             updateChatReplyBoxColors(ReplyBoxBackgroundColor, ReplyTextColor, customFocusColor$1);
-            if (!Player.ExtensionSettings.BCA.settings.enableCustomFocusColor) {
+            if (!Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
                 customFocusColor.disable();
             }
             ElementRemove("InputReplyBoxBackgroundColor");
@@ -637,11 +641,11 @@
     function updateChatReplyBoxColors(newBackgroundColor, newTextColor, customFocusColor$1) {
         if (CommonIsColor(newBackgroundColor) && CommonIsColor(newTextColor) && CommonIsColor(customFocusColor$1)) {
             document.documentElement.style.setProperty('--reply-background-color', newBackgroundColor);
-            Player.ExtensionSettings.BCA.settings.replyBackgroundColor = newBackgroundColor;
+            Player.ExtensionSettings.BCR.settings.replyBackgroundColor = newBackgroundColor;
             document.documentElement.style.setProperty('--reply-text-color', newTextColor);
-            Player.ExtensionSettings.BCA.settings.replyTextColor = newTextColor;
-            if (Player.ExtensionSettings.BCA.settings.enableCustomFocusColor) {
-                Player.ExtensionSettings.BCA.settings.customFocusColor = customFocusColor$1;
+            Player.ExtensionSettings.BCR.settings.replyTextColor = newTextColor;
+            if (Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
+                Player.ExtensionSettings.BCR.settings.customFocusColor = customFocusColor$1;
                 if (isReplyMode) {
                     customFocusColor.enable(customFocusColor$1);
                 }
@@ -670,24 +674,24 @@
         DrawText(label, cords[0] - 250, cords[1] + 33, "Black", "Gray");
     }
 
-    BCAStart().catch((error) => {
+    BCRStart().catch((error) => {
         console.log(error);
     });
 
-    async function BCAStart() {
+    async function BCRStart() {
         // @ts-ignore
         await waitFor(() => ServerIsConnected && ServerSocket);
         await waitFor(() => !!!!Player?.AccountName);
         // @ts-ignore
-        if (!window.BCA_VERSION) {
+        if (!window.BCR_VERSION) {
             settings();
             await settingsPage();
             loadCss();
             commands();
             reply();
-            console.log("BCA loaded!");
+            console.log("BCR loaded!");
         } else {
-            console.log("BCA is already loaded!");
+            console.log("BCR is already loaded!");
         }
     }
 
