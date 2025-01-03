@@ -7,7 +7,7 @@ export interface Settings {
     customFocusColor: string,
 }
 
-export interface BCAPlayerInfos {
+export interface BCRPlayerInfos {
     settings: Settings
 }
 
@@ -18,15 +18,15 @@ export const defaultSettings: Settings = {
     customFocusColor: "#FF0000"
 }
 
-let BCAPlayerInfos: BCAPlayerInfos = {
+let BCRPlayerInfos: BCRPlayerInfos = {
     settings: {...defaultSettings},
 }
 
 export function settings() {
-    if (!Player.ExtensionSettings.BCA) {
-        Player.ExtensionSettings.BCA = BCAPlayerInfos;
+    if (!Player.ExtensionSettings.BCR) {
+        Player.ExtensionSettings.BCR = BCRPlayerInfos;
     }
 
     // @ts-ignore
-    window.BCA_VERSION = constants.MOD_VERSION;
+    window.BCR_VERSION = constants.MOD_VERSION;
 }

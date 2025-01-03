@@ -46,8 +46,8 @@ function chatReplyBoxCss() {
     style.innerHTML =
         `
             :root {
-                --reply-background-color: ${Player.ExtensionSettings.BCA.settings.replyBackgroundColor};
-                --reply-text-color: ${Player.ExtensionSettings.BCA.settings.replyTextColor};
+                --reply-background-color: ${Player.ExtensionSettings.BCR.settings.replyBackgroundColor};
+                --reply-text-color: ${Player.ExtensionSettings.BCR.settings.replyTextColor};
             }
 
             .ChatReplyBox {

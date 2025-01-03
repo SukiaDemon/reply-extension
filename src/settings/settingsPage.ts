@@ -12,22 +12,22 @@ export async function settingsPage() {
     let hideCustomFocusColorPicker: boolean = true;
 
     PreferenceRegisterExtensionSetting({
-        Identifier: "BCA",
-        ButtonText: "BCA Settings",
+        Identifier: "BCR",
+        ButtonText: "BCR Settings",
         Image: undefined, // TODO: Need to find/create cool image
-        load: PreferenceSubScreenBCASettingsLoad,
-        click: PreferenceSubScreenBCASettingsClick,
-        run: PreferenceSubScreenBCASettingsRun,
-        exit: PreferenceSubScreenBCASettingsExit,
+        load: PreferenceSubScreenBCRSettingsLoad,
+        click: PreferenceSubScreenBCRSettingsClick,
+        run: PreferenceSubScreenBCRSettingsRun,
+        exit: PreferenceSubScreenBCRSettingsExit,
     });
 
-    function PreferenceSubScreenBCASettingsLoad() {
+    function PreferenceSubScreenBCRSettingsLoad() {
         //ReplyBoxBackgroundColor Input Field
-        ElementCreateInput("InputReplyBoxBackgroundColor", "text", Player.ExtensionSettings.BCA.settings.replyBackgroundColor);
+        ElementCreateInput("InputReplyBoxBackgroundColor", "text", Player.ExtensionSettings.BCR.settings.replyBackgroundColor);
         //ReplyTextColor Input Field
-        ElementCreateInput("InputReplyTextColor", "text", Player.ExtensionSettings.BCA.settings.replyTextColor);
+        ElementCreateInput("InputReplyTextColor", "text", Player.ExtensionSettings.BCR.settings.replyTextColor);
         //CustomFocusColor Input field
-        ElementCreateInput("InputCustomFocusColor", "text", Player.ExtensionSettings.BCA.settings.customFocusColor);
+        ElementCreateInput("InputCustomFocusColor", "text", Player.ExtensionSettings.BCR.settings.customFocusColor);
 
         hideBackGroundColorPicker = true;
         hideTextColorPicker = true;
@@ -35,9 +35,9 @@ export async function settingsPage() {
 
     }
 
-    function PreferenceSubScreenBCASettingsClick() {
+    function PreferenceSubScreenBCRSettingsClick() {
         if (MouseIn(1815, 75, 90, 90)) { //Exit Icon Click
-            PreferenceSubScreenBCASettingsExit();
+            PreferenceSubScreenBCRSettingsExit();
         }
         if (MouseIn(1140, 215, 65, 65)) { //ReplyBoxBackgroundColor Icon Click
             hideTextColorPicker = true;
@@ -65,11 +65,11 @@ export async function settingsPage() {
         }
 
         if (MouseIn(1000, 415, 64, 64)) {
-            Player.ExtensionSettings.BCA.settings.enableCustomFocusColor = !Player.ExtensionSettings.BCA.settings.enableCustomFocusColor;
+            Player.ExtensionSettings.BCR.settings.enableCustomFocusColor = !Player.ExtensionSettings.BCR.settings.enableCustomFocusColor;
         }
     }
 
-    function PreferenceSubScreenBCASettingsRun() {
+    function PreferenceSubScreenBCRSettingsRun() {
         DrawCharacter(Player, 50, 50, 0.9);
         DrawButton(1815, 75, 90, 90, "", "White", "Icons/Exit.png"); //Exit Icon
 
@@ -85,7 +85,7 @@ export async function settingsPage() {
 
         updateInputFieldTextColor("InputReplyTextColor")
 
-        addCheckBox([1000, 415, 64, 64], "Enable custom color", Player.ExtensionSettings.BCA.settings.enableCustomFocusColor);
+        addCheckBox([1000, 415, 64, 64], "Enable custom color", Player.ExtensionSettings.BCR.settings.enableCustomFocusColor);
         DrawText("Custom chat focus color: ", 660, 550, "Black", "Gray") //CustomFocusColor Label
         ElementPosition("InputCustomFocusColor", 1000, 550, 250); //CustomFocusColor ColorPicker Position
 
@@ -110,12 +110,12 @@ export async function settingsPage() {
 
     }
 
-    function PreferenceSubScreenBCASettingsExit() {
+    function PreferenceSubScreenBCRSettingsExit() {
         const ReplyBoxBackgroundColor = ElementValue("InputReplyBoxBackgroundColor");
         const ReplyTextColor = ElementValue("InputReplyTextColor");
         const customFocusColor = ElementValue("InputCustomFocusColor");
         updateChatReplyBoxColors(ReplyBoxBackgroundColor, ReplyTextColor, customFocusColor);
-        if (!Player.ExtensionSettings.BCA.settings.enableCustomFocusColor) {
+        if (!Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
             customFocusColorCSS.disable();
         }
         ElementRemove("InputReplyBoxBackgroundColor");
@@ -128,12 +128,12 @@ export async function settingsPage() {
 function updateChatReplyBoxColors(newBackgroundColor: string, newTextColor: string, customFocusColor: string) {
     if (CommonIsColor(newBackgroundColor) && CommonIsColor(newTextColor) && CommonIsColor(customFocusColor)) {
         document.documentElement.style.setProperty('--reply-background-color', newBackgroundColor);
-        Player.ExtensionSettings.BCA.settings.replyBackgroundColor = newBackgroundColor;
+        Player.ExtensionSettings.BCR.settings.replyBackgroundColor = newBackgroundColor;
         document.documentElement.style.setProperty('--reply-text-color', newTextColor);
-        Player.ExtensionSettings.BCA.settings.replyTextColor = newTextColor;
+        Player.ExtensionSettings.BCR.settings.replyTextColor = newTextColor;
 
-        if (Player.ExtensionSettings.BCA.settings.enableCustomFocusColor) {
-            Player.ExtensionSettings.BCA.settings.customFocusColor = customFocusColor
+        if (Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
+            Player.ExtensionSettings.BCR.settings.customFocusColor = customFocusColor
             if (isReplyMode) {
                 customFocusColorCSS.enable(customFocusColor)
             }

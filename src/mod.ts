@@ -9,7 +9,7 @@ const MOD_REPOSITORY = "";*/
 export let mod = null;
 
 // @ts-ignore
-if (!window.BCA_VERSION) {
+if (!window.BCR_VERSION) {
     mod = bcModSdk.registerMod({
         name: constants.MOD_NAME,
         fullName: constants.MOD_FULL_NAME,

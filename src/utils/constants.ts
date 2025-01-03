@@ -1,8 +1,8 @@
 const constants = {
 
     //Mod infos
-    MOD_NAME: "BCA",
-    MOD_FULL_NAME: "Bondage Club Additions",
+    MOD_NAME: "BCR",
+    MOD_FULL_NAME: "Bondage Club Reply Extension",
     MOD_VERSION: "0.1.0",
     MOD_REPOSITORY: "",
 

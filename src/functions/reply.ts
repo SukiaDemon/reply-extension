@@ -113,8 +113,8 @@ function addButtonToLastMessage(messageText: string, messageSenderNumber: number
                 isReplyMode = true;
                 chatInput.placeholder = "Reply to " + repliedMessageAuthor;
 
-                if (Player.ExtensionSettings.BCA.settings.enableCustomFocusColor) {
-                    customFocusColor.enable(Player.ExtensionSettings.BCA.settings.customFocusColor);
+                if (Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
+                    customFocusColor.enable(Player.ExtensionSettings.BCR.settings.customFocusColor);
                 }
                 chatInput.focus();
 
@@ -122,7 +122,7 @@ function addButtonToLastMessage(messageText: string, messageSenderNumber: number
                     const closeButton = ElementButton.Create(
                         constants.CHAT_ROOM_REPLY_CLOSE, () => {
                             isReplyMode = false;
-                            if (Player.ExtensionSettings.BCA.settings.enableCustomFocusColor) {
+                            if (Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
                                 customFocusColor.disable();
                             }
                             chatInput.placeholder = constants.TALK_TO_EVERYONE_PLACEHOLDER

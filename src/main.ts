@@ -6,13 +6,13 @@ import {settings} from "./settings/settings";
 import {waitFor} from "./functions/utils";
 
 
-BCAStart().catch(
+BCRStart().catch(
     (error) => {
         console.log(error)
     }
 )
 
-async function BCAStart() {
+async function BCRStart() {
 
     // @ts-ignore
     await waitFor(() => ServerIsConnected && ServerSocket);
@@ -20,14 +20,14 @@ async function BCAStart() {
     await waitFor(() => !!!!Player?.AccountName);
 
     // @ts-ignore
-    if (!window.BCA_VERSION) {
+    if (!window.BCR_VERSION) {
         settings();
         await settingsPage()
         loadCss();
         commands();
         reply();
-        console.log("BCA loaded!")
+        console.log("BCR loaded!")
     } else {
-        console.log("BCA is already loaded!")
+        console.log("BCR is already loaded!")
     }
 }
