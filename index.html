@@ -2,11 +2,59 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Bondage Club Additions</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BC Reply Extension</title>
     <script src="bca.js"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-Welcome to my page!
-Have fun!
+
+<header>
+    <h1>BC Reply Extension</h1>
+    <p>A simple way to reply to specific messages in any chat!</p>
+</header>
+
+<div class="content">
+    <section>
+        <h2 class="section-title">Features</h2>
+        <p class="description">The BC Reply Extension lets you reply to specific messages in a chat, just like in other
+            messaging apps such as Discord, Messenger, WhatsApp, etc.</p>
+    </section>
+
+    <section>
+        <h2 class="section-title">Screenshots</h2>
+        <p class="description">Here you can view pictures of the extension in action:</p>
+        <!-- Insert images here -->
+        <img src="your-image-path.png" alt="Extension in action" width="500">
+    </section>
+
+    <section>
+        <h2 class="section-title">Settings</h2>
+        <p class="description">In the BC Reply settings, you can customize the colors for the reply box, reply box text,
+            and the border of the text area when in reply mode. This allows for personalized theme options.</p>
+    </section>
+
+    <section class="install-links">
+        <h2 class="section-title">Installation</h2>
+        <div class="description">
+            <h3>Stable Version</h3>
+            <p>You can install the stable version through the following methods:</p>
+            <a href="https://github.com/Arcsery/reply-extension/raw/gh-pages/BCA-1.user.js" class="install-link">Tampermonkey</a>
+            <a href="javascript:(function() {%20var%20script%20=%20document.createElement('script');%20script.src%20=%20'https://arcsery.github.io/reply-extension//bca.js';%20document.head.appendChild(script);%20})()">Bookmark</a>
+            <p><strong>Note:</strong> You can also install it via the console by dumping the contents of
+                <code>bca.js</code>, though this method is not recommended.</p>
+        </div>
+        <!--
+        <div class="description">
+            <h3>Dev Version</h3>
+            <p>If you want to access new features earlier, you can install the dev version. Be cautious, as it may
+                contain bugs:</p>
+            <a href="{link}" class="install-link">Tampermonkey (Dev version)</a>
+            <a href="javascript:void(0);" class="install-link">Bookmark (Address: {code})</a>
+            <p>You can also install it via the console with <code>bcaDev.js</code>.</p>
+        </div>
+        -->
+    </section>
+</div>
 </body>
 </html>

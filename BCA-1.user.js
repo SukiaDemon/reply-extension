@@ -3,7 +3,7 @@
 // @namespace    https://www.bondageprojects.com/
 // @version      1
 // @description  Bondage club additions.
-// @author       agicitag
+// @author       1010
 // @match https://bondageprojects.elementfx.com/*
 // @match https://www.bondageprojects.elementfx.com/*
 // @match https://bondage-europe.com/*
