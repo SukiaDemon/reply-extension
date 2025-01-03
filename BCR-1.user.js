@@ -13,9 +13,9 @@
 // @grant        none
 // ==/UserScript==
 
-(function() {
+(function () {
     'use strict';
     var script = document.createElement("script");
-    script.src = "https://arcsery.github.io/reply-extension//bca.js";
+    script.src = "https://arcsery.github.io/reply-extension/bcr.js";
     document.head.appendChild(script);
 })();
