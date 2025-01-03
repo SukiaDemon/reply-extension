@@ -85,7 +85,7 @@ export async function settingsPage() {
 
         updateInputFieldTextColor("InputReplyTextColor")
 
-        addCheckBox([1000, 415, 64, 64], "Enable custom color", Player.ExtensionSettings.BCR.settings.enableCustomFocusColor);
+        addCheckBox([1000, 415, 64, 64], "Enable custom focus color", Player.ExtensionSettings.BCR.settings.enableCustomFocusColor);
         DrawText("Custom chat focus color: ", 660, 550, "Black", "Gray") //CustomFocusColor Label
         ElementPosition("InputCustomFocusColor", 1000, 550, 250); //CustomFocusColor ColorPicker Position
 

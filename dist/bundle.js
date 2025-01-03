@@ -227,7 +227,11 @@
 	            const chatInput = document.getElementById(constants.InputChat_DIV_ID);
 	            //chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
 	            isReplyMode = true;
-	            chatInput.placeholder = "Reply to " + repliedMessageAuthor;
+	            let placeholderText = messageText;
+	            if (messageText.length > 10) {
+	                placeholderText = placeholderText.slice(0, 10) + "...";
+	            }
+	            chatInput.placeholder = "Reply to " + repliedMessageAuthor + ": " + placeholderText;
 	            if (Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
 	                customFocusColor.enable(Player.ExtensionSettings.BCR.settings.customFocusColor);
 	            }
@@ -395,7 +399,7 @@
 	        ElementPosition("InputReplyTextColor", 1000, 350, 250); //ReplyTextColor ColorPicker Position
 	        DrawButton(1140, 315, 65, 65, "", "White", "Icons/Color.png"); //ReplyTextColor Icon Position
 	        updateInputFieldTextColor("InputReplyTextColor");
-	        addCheckBox([1000, 415, 64, 64], "Enable custom color", Player.ExtensionSettings.BCR.settings.enableCustomFocusColor);
+	        addCheckBox([1000, 415, 64, 64], "Enable custom focus color", Player.ExtensionSettings.BCR.settings.enableCustomFocusColor);
 	        DrawText("Custom chat focus color: ", 660, 550, "Black", "Gray"); //CustomFocusColor Label
 	        ElementPosition("InputCustomFocusColor", 1000, 550, 250); //CustomFocusColor ColorPicker Position
 	        DrawButton(1140, 515, 65, 65, "", "White", "Icons/Color.png"); //CustomFocusColor Icon Position

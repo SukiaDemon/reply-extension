@@ -111,7 +111,13 @@ function addButtonToLastMessage(messageText: string, messageSenderNumber: number
                 const chatInput: HTMLTextAreaElement | null = document.getElementById(constants.InputChat_DIV_ID) as HTMLTextAreaElement | null;
                 //chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
                 isReplyMode = true;
-                chatInput.placeholder = "Reply to " + repliedMessageAuthor;
+
+                let placeholderText = messageText
+                if (messageText.length > 10) {
+                    placeholderText = placeholderText.slice(0, 10) + "..."
+                }
+
+                chatInput.placeholder = "Reply to " + repliedMessageAuthor + ": " + placeholderText;
 
                 if (Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
                     customFocusColor.enable(Player.ExtensionSettings.BCR.settings.customFocusColor);
