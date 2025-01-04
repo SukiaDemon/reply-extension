@@ -362,7 +362,7 @@
 	        if (MouseIn(1815, 75, 90, 90)) { //Exit Icon Click
 	            PreferenceSubScreenBCRSettingsExit();
 	        }
-	        if (MouseIn(1450, 650, 400, 90)) {
+	        if (MouseIn(1350, 75, 400, 90)) { //Open Source
 	            window.open("https://github.com/Arcsery/reply-extension/tree/gh-pages", "_blank");
 	        }
 	        if (MouseIn(1140, 215, 65, 65)) { //ReplyBoxBackgroundColor Icon Click
@@ -383,9 +383,11 @@
 	            ColorPickerHide();
 	            hideCustomFocusColorPicker = !hideCustomFocusColorPicker;
 	        }
-	        if (MouseIn(600, 715, 300, 100)) {
+	        if (MouseIn(600, 715, 400, 90)) {
+	            Player.ExtensionSettings.BCR.settings.enableCustomFocusColor = defaultSettings.enableCustomFocusColor;
 	            ElementValue("InputReplyBoxBackgroundColor", defaultSettings.replyBackgroundColor);
 	            ElementValue("InputReplyTextColor", defaultSettings.replyTextColor);
+	            ElementValue("InputCustomFocusColor", defaultSettings.customFocusColor);
 	        }
 	        if (MouseIn(1000, 415, 64, 64)) {
 	            Player.ExtensionSettings.BCR.settings.enableCustomFocusColor = !Player.ExtensionSettings.BCR.settings.enableCustomFocusColor;
@@ -395,7 +397,7 @@
 	        DrawCharacter(Player, 50, 50, 0.9);
 	        DrawButton(1815, 75, 90, 90, "", "White", "Icons/Exit.png"); //Exit Icon
 	        DrawText("BC Reply Extension " + constants.MOD_VERSION, 1000, 130, "Black");
-	        DrawButton(1350, 75, 400, 90, "Open Source", "White");
+	        DrawButton(1350, 75, 400, 90, "Open Source", "White"); //Open Source
 	        DrawText("Reply box background color: ", 630, 250, "Black", "Gray"); //ReplyBoxBackgroundColor Label
 	        ElementPosition("InputReplyBoxBackgroundColor", 1000, 250, 250); //ReplyBoxBackgroundColor ColorPicker Position
 	        DrawButton(1140, 215, 65, 65, "", "White", "Icons/Color.png"); //ReplyBoxBackgroundColor Icon Position
@@ -418,7 +420,7 @@
 	        if (!hideCustomFocusColorPicker) {
 	            ColorPickerDraw(1250, 185, 675, 800, document.getElementById("InputCustomFocusColor"));
 	        }
-	        DrawButton(600, 715, 400, 90, "Restore to default", "White");
+	        DrawButton(600, 715, 400, 90, "Restore to default", "White"); //Restore to default
 	    }
 	    function PreferenceSubScreenBCRSettingsExit() {
 	        const ReplyBoxBackgroundColor = ElementValue("InputReplyBoxBackgroundColor");

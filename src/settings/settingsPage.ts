@@ -41,7 +41,7 @@ export async function settingsPage() {
             PreferenceSubScreenBCRSettingsExit();
         }
 
-        if (MouseIn(1450, 650, 400, 90)) {
+        if (MouseIn(1350, 75, 400, 90)) { //Open Source
             window.open("https://github.com/Arcsery/reply-extension/tree/gh-pages", "_blank");
         }
 
@@ -65,9 +65,11 @@ export async function settingsPage() {
             hideCustomFocusColorPicker = !hideCustomFocusColorPicker;
         }
 
-        if (MouseIn(600, 715, 300, 100)) {
+        if (MouseIn(600, 715, 400, 90)) {
+            Player.ExtensionSettings.BCR.settings.enableCustomFocusColor = defaultSettings.enableCustomFocusColor;
             ElementValue("InputReplyBoxBackgroundColor", defaultSettings.replyBackgroundColor)
             ElementValue("InputReplyTextColor", defaultSettings.replyTextColor)
+            ElementValue("InputCustomFocusColor", defaultSettings.customFocusColor)
         }
 
         if (MouseIn(1000, 415, 64, 64)) {
@@ -80,7 +82,7 @@ export async function settingsPage() {
         DrawButton(1815, 75, 90, 90, "", "White", "Icons/Exit.png"); //Exit Icon
 
         DrawText("BC Reply Extension " + constants.MOD_VERSION, 1000, 130, "Black");
-        DrawButton(1350, 75, 400, 90, "Open Source", "White");
+        DrawButton(1350, 75, 400, 90, "Open Source", "White"); //Open Source
 
         DrawText("Reply box background color: ", 630, 250, "Black", "Gray") //ReplyBoxBackgroundColor Label
         ElementPosition("InputReplyBoxBackgroundColor", 1000, 250, 250); //ReplyBoxBackgroundColor ColorPicker Position
@@ -115,7 +117,7 @@ export async function settingsPage() {
         }
 
 
-        DrawButton(600, 715, 400, 90, "Restore to default", "White");
+        DrawButton(600, 715, 400, 90, "Restore to default", "White"); //Restore to default
 
     }
 
