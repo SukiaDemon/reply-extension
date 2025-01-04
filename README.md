@@ -7,15 +7,6 @@ as Discord, Messenger, WhatsApp, etc.
 
 ## Features
 
-- Reply to specific messages in the chat.
-- Customizable colors for the reply box, reply box text, and borders when in reply mode.
-
-## Screenshots
-
-![Extension in Action](your-image-path.png)
-
-*Insert more images if necessary*
-
 ## Installation
 
 ### Stable Version
@@ -31,3 +22,18 @@ To install the stable version, use one of the following methods:
     script.src = 'https://arcsery.github.io/reply-extension/bcr.js'; 
     document.head.appendChild(script); 
   })();
+
+- Reply to specific messages in the chat.
+- Customizable colors for the reply box, reply box text, and borders when in reply mode.
+
+## Screenshots
+
+### Here you can view pictures of the extension in action:
+
+<img src="images/fullMessageDark.png" alt="example1"  width="75%" height="50%"> 
+<img src="images/onlyMessagesLight.png" alt="example1"  width="50%" height="50%"> 
+*Insert more images if necessary*
+
+### Settings:
+
+<img src="images/settings.png" alt="settings"  width="75%" height="50%">
