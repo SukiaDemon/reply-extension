@@ -20,7 +20,7 @@
 	    //Mod infos
 	    MOD_NAME: "BCR",
 	    MOD_FULL_NAME: "Bondage Club Reply Extension",
-	    MOD_VERSION: "0.1.0",
+	    MOD_VERSION: "1.0.0",
 	    MOD_REPOSITORY: "",
 	    //ReplyContent.isReplyMessage
 	    IS_REPLY_MESSAGE: "isReplyMessage",
