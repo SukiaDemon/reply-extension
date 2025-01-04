@@ -2,6 +2,7 @@ import {defaultSettings} from "./settings";
 import {customFocusColor as customFocusColorCSS} from "../css/css";
 import {isReplyMode} from "../functions/reply";
 import {waitFor} from "../functions/utils";
+import constants from "../utils/constants";
 
 export async function settingsPage() {
 
@@ -39,6 +40,11 @@ export async function settingsPage() {
         if (MouseIn(1815, 75, 90, 90)) { //Exit Icon Click
             PreferenceSubScreenBCRSettingsExit();
         }
+
+        if (MouseIn(1450, 650, 400, 90)) {
+            window.open("https://github.com/Arcsery/reply-extension/tree/gh-pages", "_blank");
+        }
+
         if (MouseIn(1140, 215, 65, 65)) { //ReplyBoxBackgroundColor Icon Click
             hideTextColorPicker = true;
             hideCustomFocusColorPicker = true;
@@ -73,6 +79,9 @@ export async function settingsPage() {
         DrawCharacter(Player, 50, 50, 0.9);
         DrawButton(1815, 75, 90, 90, "", "White", "Icons/Exit.png"); //Exit Icon
 
+        DrawText("BC Reply Extension " + constants.MOD_VERSION, 1000, 130, "Black");
+        DrawButton(1350, 75, 400, 90, "Open Source", "White");
+
         DrawText("Reply box background color: ", 630, 250, "Black", "Gray") //ReplyBoxBackgroundColor Label
         ElementPosition("InputReplyBoxBackgroundColor", 1000, 250, 250); //ReplyBoxBackgroundColor ColorPicker Position
         DrawButton(1140, 215, 65, 65, "", "White", "Icons/Color.png");  //ReplyBoxBackgroundColor Icon Position
@@ -106,7 +115,7 @@ export async function settingsPage() {
         }
 
 
-        DrawButton(600, 715, 300, 100, "Restore to default", "White");
+        DrawButton(600, 715, 400, 90, "Restore to default", "White");
 
     }
 
@@ -121,6 +130,7 @@ export async function settingsPage() {
         ElementRemove("InputReplyBoxBackgroundColor");
         ElementRemove("InputReplyTextColor");
         ElementRemove("InputCustomFocusColor");
+        ServerPlayerExtensionSettingsSync("BCR")
         PreferenceSubscreenExtensionsClear();
     }
 }

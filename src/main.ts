@@ -4,6 +4,7 @@ import {loadCss} from "./css/css";
 import {settingsPage} from "./settings/settingsPage";
 import {settings} from "./settings/settings";
 import {waitFor} from "./functions/utils";
+import constants from "./utils/constants";
 
 
 BCRStart().catch(
@@ -26,7 +27,7 @@ async function BCRStart() {
         loadCss();
         commands();
         reply();
-        console.log("BCR loaded!")
+        console.log("BCR " + constants.MOD_VERSION + " loaded!")
     } else {
         console.log("BCR is already loaded!")
     }
