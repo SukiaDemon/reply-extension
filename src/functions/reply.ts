@@ -2,12 +2,33 @@ import {mod} from "mod";
 import {ReplyContent} from "../models/replyContent";
 import constants from "../utils/constants";
 import {customFocusColor} from "../css/css";
-import {waitFor} from "./utils";
+import {drawIcon, icon_heart, initBCRMessage, replyToInitBCRMessage, waitFor} from "../utils/utils";
 
 export let isReplyMode: boolean = false;
 export let isWaitingForReply: boolean = false
 
 export default function reply() {
+
+
+    mod.hookFunction("ChatRoomCharacterViewDrawOverlay", 2, (args, next) => {
+        next(args);
+        const [C, CharX, CharY, Zoom] = args;
+        if (C.BCR && ChatRoomHideIconState == 0) {
+            drawIcon(MainCanvas, icon_heart, CharX + 330 * Zoom, CharY + 5, 15 * Zoom, 15 * Zoom, 50, 0.7, 4, "#B22238");
+        }
+        if (MouseHovering(CharX + 330 * Zoom, CharY + 10 * Zoom, 50 * Zoom, 50 * Zoom)) {
+            if (C.MemberNumber === 35982) {
+                DrawTextFit("Blue haired Mistress", CharX + 350 * Zoom, CharY + 10 * Zoom, 150 * Zoom, "White");
+            } else {
+                DrawTextFit(C.BCR, CharX + 350 * Zoom, CharY + 10 * Zoom, 80 * Zoom, "White");
+            }
+        }
+    });
+
+    mod.hookFunction("ChatRoomLoad", 2, (args, next) => {
+        next(args);
+        initBCRMessage();
+    });
 
     mod.hookFunction("ChatRoomMessage", 1, (args, next) => {
 
@@ -38,6 +59,20 @@ export default function reply() {
 
         } else {
             next(args);
+            if (args[0]) {
+                if (args[0].Type === constants.HIDDEN && args[0].Content === constants.CONTENT) {
+
+                    if (args[0].Dictionary[0].message.type == constants.INIT_TYPE && args[0].Sender != Player.MemberNumber) {
+                        replyToInitBCRMessage(args[0].Sender);
+                    }
+
+                    const sender = Character.find((a) => a.MemberNumber === args[0].Sender);
+                    if (sender && sender.ID != 0 && args[0].Dictionary[0].message.bcrVersion) {
+                        // @ts-ignore
+                        sender.BCR = "BCR " + args[0].Dictionary[0].message.bcrVersion
+                    }
+                }
+            }
         }
     })
 

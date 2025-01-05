@@ -1,8 +1,9 @@
 import {defaultSettings} from "./settings";
 import {customFocusColor as customFocusColorCSS} from "../css/css";
 import {isReplyMode} from "../functions/reply";
-import {waitFor} from "../functions/utils";
+import {waitFor} from "../utils/utils";
 import constants from "../utils/constants";
+import replySettingsIcon from '../img/replySettingsIcon.png'
 
 export async function settingsPage() {
 
@@ -15,7 +16,7 @@ export async function settingsPage() {
     PreferenceRegisterExtensionSetting({
         Identifier: "BCR",
         ButtonText: "BCR Settings",
-        Image: undefined, // TODO: Need to find/create cool image
+        Image: replySettingsIcon,
         load: PreferenceSubScreenBCRSettingsLoad,
         click: PreferenceSubScreenBCRSettingsClick,
         run: PreferenceSubScreenBCRSettingsRun,

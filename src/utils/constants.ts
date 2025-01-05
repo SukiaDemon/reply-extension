@@ -6,6 +6,11 @@ const constants = {
     MOD_VERSION: "1.0.0",
     MOD_REPOSITORY: "",
 
+    HIDDEN: "Hidden",
+    CONTENT: "BCR_INIT",
+    INIT_TYPE: "BCR_INIT_MESSAGE",
+    INIT_REPLY_TYPE: "BCR_INIT_REPLY_MESSAGE",
+
     //ReplyContent.isReplyMessage
     IS_REPLY_MESSAGE: "isReplyMessage",
     InputChat_DIV_ID: "InputChat",
