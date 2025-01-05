@@ -10,12 +10,6 @@ as Discord, Messenger, WhatsApp, etc.
 - Reply to specific messages in the chat.
 - Customizable colors for the reply box, reply box text, and borders when in reply mode.
 
-## Screenshots
-
-![Extension in Action](your-image-path.png)
-
-*Insert more images if necessary*
-
 ## Installation
 
 ### Stable Version

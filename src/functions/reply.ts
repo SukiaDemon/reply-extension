@@ -2,7 +2,7 @@ import {mod} from "mod";
 import {ReplyContent} from "../models/replyContent";
 import constants from "../utils/constants";
 import {customFocusColor} from "../css/css";
-import {drawIcon, icon_heart, initBCRMessage, replyToInitBCRMessage, waitFor} from "../utils/utils";
+import {chatArrow, drawIcon, initBCRMessage, replyToInitBCRMessage, waitFor} from "../utils/utils";
 
 export let isReplyMode: boolean = false;
 export let isWaitingForReply: boolean = false
@@ -14,13 +14,15 @@ export default function reply() {
         next(args);
         const [C, CharX, CharY, Zoom] = args;
         if (C.BCR && ChatRoomHideIconState == 0) {
-            drawIcon(MainCanvas, icon_heart, CharX + 330 * Zoom, CharY + 5, 15 * Zoom, 15 * Zoom, 50, 0.7, 4, "#B22238");
+            drawIcon(MainCanvas, chatArrow, CharX + 330 * Zoom, CharY + 5, 15 * Zoom, 15 * Zoom, 50, 0.7, 4, "#B22238");
         }
         if (MouseHovering(CharX + 330 * Zoom, CharY + 10 * Zoom, 50 * Zoom, 50 * Zoom)) {
             if (C.MemberNumber === 35982) {
-                DrawTextFit("Blue haired Mistress", CharX + 350 * Zoom, CharY + 10 * Zoom, 150 * Zoom, "White");
+                DrawRect(CharX + 270 * Zoom, CharY + 60 * Zoom, 160 * Zoom, 20 * Zoom, "Black")
+                DrawTextFit("Blue haired Mistress", CharX + 350 * Zoom, CharY + 70 * Zoom, 150 * Zoom, "White", "Black");
             } else {
-                DrawTextFit(C.BCR, CharX + 350 * Zoom, CharY + 10 * Zoom, 80 * Zoom, "White");
+                DrawRect(CharX + 305 * Zoom, CharY + 60 * Zoom, 90 * Zoom, 20 * Zoom, "Black")
+                DrawTextFit(C.BCR, CharX + 350 * Zoom, CharY + 70 * Zoom, 80 * Zoom, "White", "Black");
             }
         }
     });
