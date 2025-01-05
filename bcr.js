@@ -387,7 +387,7 @@
         ServerSend("ChatRoomChat", bcrReplyToInitMessage);
     }
 
-    const icon_heart = `M78.1 0v6.2c22.4 0 40.5 18.2 40.5 40.6s-18.1 40.6-40.5 40.6H17.9l27.9-28-4.5-4.5L5.5 90.8l36 36.2 4.5-4.5-28.8-28.9h60.9c25.8 0 46.7-21 46.7-46.8S103.9 0 78.1 0z`;
+    const chatArrow = `M78.1 0v6.2c22.4 0 40.5 18.2 40.5 40.6s-18.1 40.6-40.5 40.6H17.9l27.9-28-4.5-4.5L5.5 90.8l36 36.2 4.5-4.5-28.8-28.9h60.9c25.8 0 46.7-21 46.7-46.8S103.9 0 78.1 0z`;
 
     function drawIcon(ctx, icon, x, y, width, height, baseSize, alpha, lineWidth, fillColor, strokeColor = "black") {
         ctx.save();
@@ -415,13 +415,15 @@
             next(args);
             const [C, CharX, CharY, Zoom] = args;
             if (C.BCR && ChatRoomHideIconState == 0) {
-                drawIcon(MainCanvas, icon_heart, CharX + 330 * Zoom, CharY + 5, 15 * Zoom, 15 * Zoom, 50, 0.7, 4, "#B22238");
+                drawIcon(MainCanvas, chatArrow, CharX + 330 * Zoom, CharY + 5, 15 * Zoom, 15 * Zoom, 50, 0.7, 4, "#B22238");
             }
             if (MouseHovering(CharX + 330 * Zoom, CharY + 10 * Zoom, 50 * Zoom, 50 * Zoom)) {
                 if (C.MemberNumber === 35982) {
-                    DrawTextFit("Blue haired Mistress", CharX + 350 * Zoom, CharY + 10 * Zoom, 150 * Zoom, "White");
+                    DrawRect(CharX + 270 * Zoom, CharY + 60 * Zoom, 160 * Zoom, 20 * Zoom, "Black");
+                    DrawTextFit("Blue haired Mistress", CharX + 350 * Zoom, CharY + 70 * Zoom, 150 * Zoom, "White", "Black");
                 } else {
-                    DrawTextFit(C.BCR, CharX + 350 * Zoom, CharY + 10 * Zoom, 80 * Zoom, "White");
+                    DrawRect(CharX + 305 * Zoom, CharY + 60 * Zoom, 90 * Zoom, 20 * Zoom, "Black");
+                    DrawTextFit(C.BCR, CharX + 350 * Zoom, CharY + 70 * Zoom, 80 * Zoom, "White", "Black");
                 }
             }
         });
