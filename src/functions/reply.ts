@@ -15,14 +15,14 @@ export default function reply() {
         const [C, CharX, CharY, Zoom] = args;
         if (C.BCR && ChatRoomHideIconState == 0) {
             drawIcon(MainCanvas, chatArrow, CharX + 330 * Zoom, CharY + 5, 15 * Zoom, 15 * Zoom, 50, 0.7, 4, "#B22238");
-        }
-        if (MouseHovering(CharX + 330 * Zoom, CharY + 10 * Zoom, 50 * Zoom, 50 * Zoom)) {
-            if (C.MemberNumber === 35982) {
-                DrawRect(CharX + 270 * Zoom, CharY + 60 * Zoom, 160 * Zoom, 20 * Zoom, "Black")
-                DrawTextFit("Blue haired Mistress", CharX + 350 * Zoom, CharY + 70 * Zoom, 150 * Zoom, "White", "Black");
-            } else {
-                DrawRect(CharX + 305 * Zoom, CharY + 60 * Zoom, 90 * Zoom, 20 * Zoom, "Black")
-                DrawTextFit(C.BCR, CharX + 350 * Zoom, CharY + 70 * Zoom, 80 * Zoom, "White", "Black");
+            if (MouseHovering(CharX + 330 * Zoom, CharY + 10 * Zoom, 50 * Zoom, 50 * Zoom)) {
+                if (C.MemberNumber === 35982) {
+                    DrawRect(CharX + 270 * Zoom, CharY + 60 * Zoom, 160 * Zoom, 20 * Zoom, "Black")
+                    DrawTextFit("Blue haired Mistress", CharX + 350 * Zoom, CharY + 70 * Zoom, 150 * Zoom, "White", "Black");
+                } else {
+                    DrawRect(CharX + 305 * Zoom, CharY + 60 * Zoom, 90 * Zoom, 20 * Zoom, "Black")
+                    DrawTextFit(C.BCR, CharX + 350 * Zoom, CharY + 70 * Zoom, 80 * Zoom, "White", "Black");
+                }
             }
         }
     });
@@ -71,7 +71,7 @@ export default function reply() {
                     const sender = Character.find((a) => a.MemberNumber === args[0].Sender);
                     if (sender && sender.ID != 0 && args[0].Dictionary[0].message.bcrVersion) {
                         // @ts-ignore
-                        sender.BCR = "BCR " + args[0].Dictionary[0].message.bcrVersion
+                        sender.BCR = args[0].Dictionary[0].message.bcrVersion
                     }
                 }
             }

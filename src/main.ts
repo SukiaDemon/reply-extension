@@ -28,7 +28,7 @@ async function BCRStart() {
         reply();
         console.log("BCR " + constants.MOD_VERSION + " loaded!")
         // @ts-ignore
-        Player.BCR = "BCR " + constants.MOD_VERSION
+        Player.BCR = constants.MOD_VERSION
         initBCRMessage();
     } else {
         console.log("BCR is already loaded!")
