@@ -30,10 +30,12 @@ To install the stable version, use one of the following methods:
 
 ### Here you can view pictures of the extension in action:
 
+<img src="images/chatwithreplybutton.png" alt="example1"  width="75%" height="50%"> 
 <img src="images/fullMessageDark.png" alt="example1"  width="75%" height="50%"> 
 <img src="images/onlyMessagesLight.png" alt="example1"  width="50%" height="50%"> 
-*Insert more images if necessary*
 
 ### Settings:
 
+In the BC Reply settings, you can customize the colors for the reply box and its text as well as the border of the text
+area when in reply mode. This allows for personalized theme options.
 <img src="images/settings.png" alt="settings"  width="75%" height="50%">
