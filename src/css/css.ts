@@ -35,7 +35,8 @@ function chatReplyButtonCss() {
         display: inline;
         cursor: pointer;
         font-size: smaller;
-        display: none;
+        display: inline-block;
+        visibility: hidden;
     }
     `;
     document.head.appendChild(style);

@@ -88,7 +88,8 @@
         display: inline;
         cursor: pointer;
         font-size: smaller;
-        display: none;
+        display: inline-block;
+        visibility: hidden;
     }
     `;
 	    document.head.appendChild(style);
@@ -357,12 +358,22 @@
 	        // @ts-ignore
 	        { noStyling: true }, { button: { classList: ["ChatReplyButton"], children: [" \u21a9\ufe0f"] } });
 	        lastMessage.onmouseenter = () => {
-	            button.style.display = "inline-block";
+	            button.style.visibility = "visible";
 	        };
 	        lastMessage.onmouseleave = () => {
-	            button.style.display = "none";
+	            button.style.visibility = "hidden";
 	        };
-	        lastMessage.appendChild(button);
+	        const lastMessageHTML = lastMessage.innerHTML; // Save the container HTML to reinsert into a wrapper div
+	        lastMessage.innerHTML = ""; // Clear the container
+	        // Create the inner and outer divs
+	        const outerMessageDiv = document.createElement("div");
+	        const innerMessageDiv = document.createElement("div");
+	        outerMessageDiv.setAttribute("style", "display: flex;");
+	        outerMessageDiv.appendChild(innerMessageDiv);
+	        // Reinsert the original message HTML into the inner div
+	        innerMessageDiv.innerHTML = lastMessageHTML;
+	        outerMessageDiv.appendChild(button); // Add the button to the outer div
+	        lastMessage.appendChild(outerMessageDiv); // Add the outer div to the container
 	    }
 	}
 	function addReplyBoxToLastMessage(messageText, messageSender) {
