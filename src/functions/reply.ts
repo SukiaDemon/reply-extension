@@ -36,9 +36,6 @@ export default function reply() {
 
         if (args[0] && args[0].Type && args[0].Type == "Chat") {
             let chatMessage = args[0];
-
-            console.log("test")
-
             let replyMessageData: ReplyContent = null;
             // @ts-ignore
             if (chatMessage.Dictionary) {
@@ -119,6 +116,7 @@ export default function reply() {
             await waitFor(() => !!addReplyBoxToLastMessage);
             next(args)
         }
+        await waitFor(() => !!addButtonToLastMessage);
         next(args)
     })
 }
@@ -140,9 +138,19 @@ function addButtonToLastMessage(messageText: string, messageSenderNumber: number
         const userNameDiv = lastMessage.querySelector('.ChatMessageName');
         const userName = userNameDiv.innerText;
 
-        let button = ElementButton.Create(
-            null,
-            () => {
+        const span = document.createElement("span");
+        span.classList.add("ChatReplyButton");
+
+        lastMessage.onmouseenter = () => {
+            span.style.visibility = "visible";
+        };
+        lastMessage.onmouseleave = () => {
+            span.style.visibility = "hidden";
+        };
+
+        span.innerHTML = "&nbsp\u21a9\ufe0f"
+        span.onclick = () => {
+            {
 
                 const closeButtonHtml = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE) as HTMLElement
 
@@ -192,31 +200,10 @@ function addButtonToLastMessage(messageText: string, messageSenderNumber: number
                     collapseButton.textContent = ">"
                     buttonBox.appendChild(closeButton);
                 }
-            },
-            // @ts-ignore
-            {noStyling: true},
-            {button: {classList: ["ChatReplyButton"], children: [" \u21a9\ufe0f"]}}
-        )
-        lastMessage.onmouseenter = () => {
-            button.style.visibility = "visible";
-        };
-        lastMessage.onmouseleave = () => {
-            button.style.visibility = "hidden";
-        };
+            }
 
-        const lastMessageHTML = lastMessage.innerHTML; // Save the container HTML to reinsert into a wrapper div
-        lastMessage.innerHTML = ""; // Clear the container
-
-        // Create the inner and outer divs
-        const outerMessageDiv = document.createElement("div");
-        const innerMessageDiv = document.createElement("div");
-        outerMessageDiv.setAttribute("style", "display: flex;");
-        outerMessageDiv.appendChild(innerMessageDiv);
-
-        // Reinsert the original message HTML into the inner div
-        innerMessageDiv.innerHTML = lastMessageHTML;
-        outerMessageDiv.appendChild(button); // Add the button to the outer div
-        lastMessage.appendChild(outerMessageDiv); // Add the outer div to the container
+        }
+        lastMessage.appendChild(span)
     }
 }
 

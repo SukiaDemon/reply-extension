@@ -32,10 +32,8 @@ function chatReplyButtonCss() {
     .ChatReplyButton {
         text-decoration: none;
         font-style: normal;
-        display: inline;
         cursor: pointer;
         font-size: smaller;
-        display: inline-block;
         visibility: hidden;
     }
     `;

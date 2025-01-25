@@ -85,10 +85,8 @@
     .ChatReplyButton {
         text-decoration: none;
         font-style: normal;
-        display: inline;
         cursor: pointer;
         font-size: smaller;
-        display: inline-block;
         visibility: hidden;
     }
     `;
@@ -230,6 +228,7 @@
 	    mod.hookFunction("ChatRoomMessage", 1, (args, next) => {
 	        if (args[0] && args[0].Type && args[0].Type == "Chat") {
 	            let chatMessage = args[0];
+	            console.log("test");
 	            let replyMessageData = null;
 	            // @ts-ignore
 	            if (chatMessage.Dictionary) {
@@ -299,6 +298,7 @@
 	            await waitFor(() => !!addReplyBoxToLastMessage);
 	            next(args);
 	        }
+	        await waitFor(() => !!addButtonToLastMessage);
 	        next(args);
 	    });
 	}
@@ -314,66 +314,59 @@
 	    if (lastMessage) {
 	        const userNameDiv = lastMessage.querySelector('.ChatMessageName');
 	        const userName = userNameDiv.innerText;
-	        let button = ElementButton.Create(null, () => {
-	            const closeButtonHtml = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE);
-	            repliedMessage = messageText;
-	            repliedMessageAuthor = userName;
-	            repliedMessageAuthorNumber = messageSenderNumber;
-	            const chatInput = document.getElementById(constants.InputChat_DIV_ID);
-	            //chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
-	            isReplyMode = true;
-	            let placeholderText = messageText;
-	            if (messageText.length > 10) {
-	                placeholderText = placeholderText.slice(0, 10) + "...";
-	            }
-	            chatInput.placeholder = "Reply to " + repliedMessageAuthor + ": " + placeholderText;
-	            if (Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
-	                customFocusColor.enable(Player.ExtensionSettings.BCR.settings.customFocusColor);
-	            }
-	            chatInput.focus();
-	            if (!closeButtonHtml) {
-	                const closeButton = ElementButton.Create(constants.CHAT_ROOM_REPLY_CLOSE, () => {
-	                    isReplyMode = false;
-	                    if (Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
-	                        customFocusColor.disable();
-	                    }
-	                    chatInput.placeholder = constants.TALK_TO_EVERYONE_PLACEHOLDER;
-	                    repliedMessage = "";
-	                    repliedMessageAuthor = "";
-	                    repliedMessageAuthorNumber = null;
-	                    const closeButtonHtmlAfterClick = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE);
-	                    closeButtonHtmlAfterClick.remove();
-	                    collapseButton.setAttribute("aria-expanded", "false");
-	                    collapseButton.textContent = "<";
-	                }, 
-	                // @ts-ignore
-	                { noStyling: true }, { button: { classList: ["chat-room-button"] } });
-	                const buttonBox = document.getElementById("chat-room-buttons");
-	                const collapseButton = document.getElementById("chat-room-buttons-collapse");
-	                collapseButton.setAttribute("aria-expanded", "true");
-	                collapseButton.textContent = ">";
-	                buttonBox.appendChild(closeButton);
-	            }
-	        }, 
-	        // @ts-ignore
-	        { noStyling: true }, { button: { classList: ["ChatReplyButton"], children: [" \u21a9\ufe0f"] } });
+	        const span = document.createElement("span");
+	        span.classList.add("ChatReplyButton");
 	        lastMessage.onmouseenter = () => {
-	            button.style.visibility = "visible";
+	            span.style.visibility = "visible";
 	        };
 	        lastMessage.onmouseleave = () => {
-	            button.style.visibility = "hidden";
+	            span.style.visibility = "hidden";
 	        };
-	        const lastMessageHTML = lastMessage.innerHTML; // Save the container HTML to reinsert into a wrapper div
-	        lastMessage.innerHTML = ""; // Clear the container
-	        // Create the inner and outer divs
-	        const outerMessageDiv = document.createElement("div");
-	        const innerMessageDiv = document.createElement("div");
-	        outerMessageDiv.setAttribute("style", "display: flex;");
-	        outerMessageDiv.appendChild(innerMessageDiv);
-	        // Reinsert the original message HTML into the inner div
-	        innerMessageDiv.innerHTML = lastMessageHTML;
-	        outerMessageDiv.appendChild(button); // Add the button to the outer div
-	        lastMessage.appendChild(outerMessageDiv); // Add the outer div to the container
+	        span.innerHTML = "&nbsp\u21a9\ufe0f";
+	        span.onclick = () => {
+	            {
+	                const closeButtonHtml = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE);
+	                repliedMessage = messageText;
+	                repliedMessageAuthor = userName;
+	                repliedMessageAuthorNumber = messageSenderNumber;
+	                const chatInput = document.getElementById(constants.InputChat_DIV_ID);
+	                //chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
+	                isReplyMode = true;
+	                let placeholderText = messageText;
+	                if (messageText.length > 10) {
+	                    placeholderText = placeholderText.slice(0, 10) + "...";
+	                }
+	                chatInput.placeholder = "Reply to " + repliedMessageAuthor + ": " + placeholderText;
+	                if (Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
+	                    customFocusColor.enable(Player.ExtensionSettings.BCR.settings.customFocusColor);
+	                }
+	                chatInput.focus();
+	                if (!closeButtonHtml) {
+	                    const closeButton = ElementButton.Create(constants.CHAT_ROOM_REPLY_CLOSE, () => {
+	                        isReplyMode = false;
+	                        if (Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
+	                            customFocusColor.disable();
+	                        }
+	                        chatInput.placeholder = constants.TALK_TO_EVERYONE_PLACEHOLDER;
+	                        repliedMessage = "";
+	                        repliedMessageAuthor = "";
+	                        repliedMessageAuthorNumber = null;
+	                        const closeButtonHtmlAfterClick = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE);
+	                        closeButtonHtmlAfterClick.remove();
+	                        collapseButton.setAttribute("aria-expanded", "false");
+	                        collapseButton.textContent = "<";
+	                    }, 
+	                    // @ts-ignore
+	                    { noStyling: true }, { button: { classList: ["chat-room-button"] } });
+	                    const buttonBox = document.getElementById("chat-room-buttons");
+	                    const collapseButton = document.getElementById("chat-room-buttons-collapse");
+	                    collapseButton.setAttribute("aria-expanded", "true");
+	                    collapseButton.textContent = ">";
+	                    buttonBox.appendChild(closeButton);
+	                }
+	            }
+	        };
+	        lastMessage.appendChild(span);
 	    }
 	}
 	function addReplyBoxToLastMessage(messageText, messageSender) {
