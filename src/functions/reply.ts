@@ -37,6 +37,8 @@ export default function reply() {
         if (args[0] && args[0].Type && args[0].Type == "Chat") {
             let chatMessage = args[0];
 
+            console.log("test")
+
             let replyMessageData: ReplyContent = null;
             // @ts-ignore
             if (chatMessage.Dictionary) {
