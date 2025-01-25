@@ -37,15 +37,18 @@ export default function reply() {
         if (args[0] && args[0].Type && args[0].Type == "Chat") {
             let chatMessage = args[0];
 
+            let replyMessageData: ReplyContent = null;
             // @ts-ignore
-            let replyMessageData: ReplyContent = chatMessage.Dictionary.find(obj => {
-                if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
-                    return obj as unknown as ReplyContent;
-                }
-                return false;
-            });
+            if (chatMessage.Dictionary) {
+                replyMessageData = chatMessage.Dictionary.find(obj => {
+                    if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
+                        return obj as unknown as ReplyContent;
+                    }
+                    return false;
+                });
+            }
 
-            if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
+            if (replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
                 isWaitingForReply = true;
             }
 

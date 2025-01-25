@@ -229,14 +229,17 @@
 	    mod.hookFunction("ChatRoomMessage", 1, (args, next) => {
 	        if (args[0] && args[0].Type && args[0].Type == "Chat") {
 	            let chatMessage = args[0];
+	            let replyMessageData = null;
 	            // @ts-ignore
-	            let replyMessageData = chatMessage.Dictionary.find(obj => {
-	                if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
-	                    return obj;
-	                }
-	                return false;
-	            });
-	            if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
+	            if (chatMessage.Dictionary) {
+	                replyMessageData = chatMessage.Dictionary.find(obj => {
+	                    if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
+	                        return obj;
+	                    }
+	                    return false;
+	                });
+	            }
+	            if (replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
 	                isWaitingForReply = true;
 	            }
 	            next(args);
