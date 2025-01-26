@@ -2,10 +2,18 @@ import {mod} from "mod";
 import {ReplyContent} from "../models/replyContent";
 import constants from "../utils/constants";
 import {customFocusColor} from "../css/css";
-import {chatArrow, drawIcon, initBCRMessage, replyToInitBCRMessage, waitFor} from "../utils/utils";
+import {
+    chatArrow,
+    drawIcon,
+    DrawTextWithRectangle,
+    initBCRMessage,
+    replyToInitBCRMessage,
+    waitFor
+} from "../utils/utils";
 
 export let isReplyMode: boolean = false;
-export let isWaitingForReply: boolean = false
+export let isWaitingForReply: boolean = false;
+export let isWaitingForAddButton: boolean = false;
 
 export default function reply() {
 
@@ -17,11 +25,9 @@ export default function reply() {
             drawIcon(MainCanvas, chatArrow, CharX + 330 * Zoom, CharY + 5, 15 * Zoom, 15 * Zoom, 700, 0.7, 4, "#f32a40");
             if (MouseHovering(CharX + 330 * Zoom, CharY + 10 * Zoom, 50 * Zoom, 50 * Zoom)) {
                 if (C.MemberNumber === 35982) {
-                    DrawRect(CharX + 270 * Zoom, CharY + 60 * Zoom, 160 * Zoom, 20 * Zoom, "Black")
-                    DrawTextFit("Blue haired Mistress", CharX + 350 * Zoom, CharY + 70 * Zoom, 150 * Zoom, "White", "Black");
+                    DrawTextWithRectangle(MainCanvas, "Blue haired Mistress", 25 * Zoom, CharX + 150 * Zoom, CharY + 60 * Zoom, 250 * Zoom, 40 * Zoom, "Black", "White");
                 } else {
-                    DrawRect(CharX + 305 * Zoom, CharY + 60 * Zoom, 90 * Zoom, 20 * Zoom, "Black")
-                    DrawTextFit(C.BCR, CharX + 350 * Zoom, CharY + 70 * Zoom, 80 * Zoom, "White", "Black");
+                    DrawTextWithRectangle(MainCanvas, C.BCR + " version", 25 * Zoom, CharX + 250 * Zoom, CharY + 60 * Zoom, 145 * Zoom, 40 * Zoom, "Black", "White");
                 }
             }
         }
@@ -36,17 +42,23 @@ export default function reply() {
 
         if (args[0] && args[0].Type && args[0].Type == "Chat") {
             let chatMessage = args[0];
-
+            let replyMessageData: ReplyContent = null;
             // @ts-ignore
-            let replyMessageData: ReplyContent = chatMessage.Dictionary.find(obj => {
-                if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
-                    return obj as unknown as ReplyContent;
-                }
-                return false;
-            });
+            if (chatMessage.Dictionary) {
+                replyMessageData = chatMessage.Dictionary.find(obj => {
+                    if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
+                        return obj as unknown as ReplyContent;
+                    }
+                    return false;
+                });
+            }
 
-            if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
+            if (replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
                 isWaitingForReply = true;
+            }
+
+            if (chatMessage.Content && chatMessage.Sender) {
+                isWaitingForAddButton = true;
             }
 
             next(args)
@@ -112,15 +124,20 @@ export default function reply() {
     mod.hookFunction("ElementScrollToEnd", 1, async (args, next) => {
         if (isWaitingForReply) {
             await waitFor(() => !!addReplyBoxToLastMessage);
-            next(args)
+            next(args);
+        }
+        if (isWaitingForAddButton) {
+            await waitFor(() => !!addButtonToLastMessage);
+            isWaitingForAddButton = false;
+            next(args);
         }
         next(args)
     })
 }
 
 export let repliedMessage: string = "";
-export let repliedMessageAuthor: string
-export let repliedMessageAuthorNumber: number
+export let repliedMessageAuthor: string;
+export let repliedMessageAuthorNumber: number;
 
 function addButtonToLastMessage(messageText: string, messageSenderNumber: number) {
     const chatContainer = document.querySelector(constants.TEXT_AREA_CHAT_LOG);
@@ -135,9 +152,19 @@ function addButtonToLastMessage(messageText: string, messageSenderNumber: number
         const userNameDiv = lastMessage.querySelector('.ChatMessageName');
         const userName = userNameDiv.innerText;
 
-        let button = ElementButton.Create(
-            null,
-            () => {
+        const span = document.createElement("span");
+        span.classList.add("ChatReplyButton");
+
+        lastMessage.onmouseenter = () => {
+            span.style.visibility = "visible";
+        };
+        lastMessage.onmouseleave = () => {
+            span.style.visibility = "hidden";
+        };
+
+        span.innerHTML = "&nbsp\u21a9\ufe0f"
+        span.onclick = () => {
+            {
 
                 const closeButtonHtml = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE) as HTMLElement
 
@@ -187,18 +214,10 @@ function addButtonToLastMessage(messageText: string, messageSenderNumber: number
                     collapseButton.textContent = ">"
                     buttonBox.appendChild(closeButton);
                 }
-            },
-            // @ts-ignore
-            {noStyling: true},
-            {button: {classList: ["ChatReplyButton"], children: [" \u21a9\ufe0f"]}}
-        )
-        lastMessage.onmouseenter = () => {
-            button.style.display = "inline-block";
-        };
-        lastMessage.onmouseleave = () => {
-            button.style.display = "none";
-        };
-        lastMessage.appendChild(button);
+            }
+
+        }
+        lastMessage.appendChild(span)
     }
 }
 

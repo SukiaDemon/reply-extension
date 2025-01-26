@@ -85,10 +85,9 @@
     .ChatReplyButton {
         text-decoration: none;
         font-style: normal;
-        display: inline;
         cursor: pointer;
         font-size: smaller;
-        display: none;
+        visibility: hidden;
     }
     `;
 	    document.head.appendChild(style);
@@ -201,9 +200,21 @@
 	    }
 	    ctx.restore();
 	}
+	function DrawTextWithRectangle(ctx, text, textSize, rectX, rectY, rectWidth, rectHeight, rectColor, textColor) {
+	    ctx.save();
+	    ctx.fillStyle = rectColor;
+	    ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+	    ctx.font = `${textSize}px Arial`;
+	    ctx.textAlign = "center";
+	    ctx.textBaseline = "middle";
+	    ctx.fillStyle = textColor;
+	    ctx.fillText(text, rectX + rectWidth / 2, rectY + rectHeight / 2);
+	    ctx.restore();
+	}
 
 	let isReplyMode = false;
 	let isWaitingForReply = false;
+	let isWaitingForAddButton = false;
 	function reply() {
 	    mod.hookFunction("ChatRoomCharacterViewDrawOverlay", 2, (args, next) => {
 	        next(args);
@@ -212,12 +223,10 @@
 	            drawIcon(MainCanvas, chatArrow, CharX + 330 * Zoom, CharY + 5, 15 * Zoom, 15 * Zoom, 700, 0.7, 4, "#f32a40");
 	            if (MouseHovering(CharX + 330 * Zoom, CharY + 10 * Zoom, 50 * Zoom, 50 * Zoom)) {
 	                if (C.MemberNumber === 35982) {
-	                    DrawRect(CharX + 270 * Zoom, CharY + 60 * Zoom, 160 * Zoom, 20 * Zoom, "Black");
-	                    DrawTextFit("Blue haired Mistress", CharX + 350 * Zoom, CharY + 70 * Zoom, 150 * Zoom, "White", "Black");
+	                    DrawTextWithRectangle(MainCanvas, "Blue haired Mistress", 25 * Zoom, CharX + 150 * Zoom, CharY + 60 * Zoom, 250 * Zoom, 40 * Zoom, "Black", "White");
 	                }
 	                else {
-	                    DrawRect(CharX + 305 * Zoom, CharY + 60 * Zoom, 90 * Zoom, 20 * Zoom, "Black");
-	                    DrawTextFit(C.BCR, CharX + 350 * Zoom, CharY + 70 * Zoom, 80 * Zoom, "White", "Black");
+	                    DrawTextWithRectangle(MainCanvas, C.BCR + " version", 25 * Zoom, CharX + 250 * Zoom, CharY + 60 * Zoom, 145 * Zoom, 40 * Zoom, "Black", "White");
 	                }
 	            }
 	        }
@@ -229,15 +238,21 @@
 	    mod.hookFunction("ChatRoomMessage", 1, (args, next) => {
 	        if (args[0] && args[0].Type && args[0].Type == "Chat") {
 	            let chatMessage = args[0];
+	            let replyMessageData = null;
 	            // @ts-ignore
-	            let replyMessageData = chatMessage.Dictionary.find(obj => {
-	                if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
-	                    return obj;
-	                }
-	                return false;
-	            });
-	            if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
+	            if (chatMessage.Dictionary) {
+	                replyMessageData = chatMessage.Dictionary.find(obj => {
+	                    if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
+	                        return obj;
+	                    }
+	                    return false;
+	                });
+	            }
+	            if (replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
 	                isWaitingForReply = true;
+	            }
+	            if (chatMessage.Content && chatMessage.Sender) {
+	                isWaitingForAddButton = true;
 	            }
 	            next(args);
 	            if (chatMessage.Content && chatMessage.Sender) {
@@ -295,6 +310,11 @@
 	            await waitFor(() => !!addReplyBoxToLastMessage);
 	            next(args);
 	        }
+	        if (isWaitingForAddButton) {
+	            await waitFor(() => !!addButtonToLastMessage);
+	            isWaitingForAddButton = false;
+	            next(args);
+	        }
 	        next(args);
 	    });
 	}
@@ -310,56 +330,59 @@
 	    if (lastMessage) {
 	        const userNameDiv = lastMessage.querySelector('.ChatMessageName');
 	        const userName = userNameDiv.innerText;
-	        let button = ElementButton.Create(null, () => {
-	            const closeButtonHtml = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE);
-	            repliedMessage = messageText;
-	            repliedMessageAuthor = userName;
-	            repliedMessageAuthorNumber = messageSenderNumber;
-	            const chatInput = document.getElementById(constants.InputChat_DIV_ID);
-	            //chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
-	            isReplyMode = true;
-	            let placeholderText = messageText;
-	            if (messageText.length > 10) {
-	                placeholderText = placeholderText.slice(0, 10) + "...";
-	            }
-	            chatInput.placeholder = "Reply to " + repliedMessageAuthor + ": " + placeholderText;
-	            if (Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
-	                customFocusColor.enable(Player.ExtensionSettings.BCR.settings.customFocusColor);
-	            }
-	            chatInput.focus();
-	            if (!closeButtonHtml) {
-	                const closeButton = ElementButton.Create(constants.CHAT_ROOM_REPLY_CLOSE, () => {
-	                    isReplyMode = false;
-	                    if (Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
-	                        customFocusColor.disable();
-	                    }
-	                    chatInput.placeholder = constants.TALK_TO_EVERYONE_PLACEHOLDER;
-	                    repliedMessage = "";
-	                    repliedMessageAuthor = "";
-	                    repliedMessageAuthorNumber = null;
-	                    const closeButtonHtmlAfterClick = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE);
-	                    closeButtonHtmlAfterClick.remove();
-	                    collapseButton.setAttribute("aria-expanded", "false");
-	                    collapseButton.textContent = "<";
-	                }, 
-	                // @ts-ignore
-	                { noStyling: true }, { button: { classList: ["chat-room-button"] } });
-	                const buttonBox = document.getElementById("chat-room-buttons");
-	                const collapseButton = document.getElementById("chat-room-buttons-collapse");
-	                collapseButton.setAttribute("aria-expanded", "true");
-	                collapseButton.textContent = ">";
-	                buttonBox.appendChild(closeButton);
-	            }
-	        }, 
-	        // @ts-ignore
-	        { noStyling: true }, { button: { classList: ["ChatReplyButton"], children: [" \u21a9\ufe0f"] } });
+	        const span = document.createElement("span");
+	        span.classList.add("ChatReplyButton");
 	        lastMessage.onmouseenter = () => {
-	            button.style.display = "inline-block";
+	            span.style.visibility = "visible";
 	        };
 	        lastMessage.onmouseleave = () => {
-	            button.style.display = "none";
+	            span.style.visibility = "hidden";
 	        };
-	        lastMessage.appendChild(button);
+	        span.innerHTML = "&nbsp\u21a9\ufe0f";
+	        span.onclick = () => {
+	            {
+	                const closeButtonHtml = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE);
+	                repliedMessage = messageText;
+	                repliedMessageAuthor = userName;
+	                repliedMessageAuthorNumber = messageSenderNumber;
+	                const chatInput = document.getElementById(constants.InputChat_DIV_ID);
+	                //chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
+	                isReplyMode = true;
+	                let placeholderText = messageText;
+	                if (messageText.length > 10) {
+	                    placeholderText = placeholderText.slice(0, 10) + "...";
+	                }
+	                chatInput.placeholder = "Reply to " + repliedMessageAuthor + ": " + placeholderText;
+	                if (Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
+	                    customFocusColor.enable(Player.ExtensionSettings.BCR.settings.customFocusColor);
+	                }
+	                chatInput.focus();
+	                if (!closeButtonHtml) {
+	                    const closeButton = ElementButton.Create(constants.CHAT_ROOM_REPLY_CLOSE, () => {
+	                        isReplyMode = false;
+	                        if (Player.ExtensionSettings.BCR.settings.enableCustomFocusColor) {
+	                            customFocusColor.disable();
+	                        }
+	                        chatInput.placeholder = constants.TALK_TO_EVERYONE_PLACEHOLDER;
+	                        repliedMessage = "";
+	                        repliedMessageAuthor = "";
+	                        repliedMessageAuthorNumber = null;
+	                        const closeButtonHtmlAfterClick = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE);
+	                        closeButtonHtmlAfterClick.remove();
+	                        collapseButton.setAttribute("aria-expanded", "false");
+	                        collapseButton.textContent = "<";
+	                    }, 
+	                    // @ts-ignore
+	                    { noStyling: true }, { button: { classList: ["chat-room-button"] } });
+	                    const buttonBox = document.getElementById("chat-room-buttons");
+	                    const collapseButton = document.getElementById("chat-room-buttons-collapse");
+	                    collapseButton.setAttribute("aria-expanded", "true");
+	                    collapseButton.textContent = ">";
+	                    buttonBox.appendChild(closeButton);
+	                }
+	            }
+	        };
+	        lastMessage.appendChild(span);
 	    }
 	}
 	function addReplyBoxToLastMessage(messageText, messageSender) {
