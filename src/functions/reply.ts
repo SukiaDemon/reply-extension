@@ -19,20 +19,15 @@ export default function reply() {
 
 
     mod.hookFunction("ChatRoomCharacterViewDrawOverlay", 2, (args, next) => {
-        let PlayerCountInRoom: number = ChatRoomCharacterDrawlist.length;
-        if (PlayerCountInRoom > 5) {
-            PlayerCountInRoom = 5;
-        }
         next(args);
         const [C, CharX, CharY, Zoom] = args;
         if (C.BCR && ChatRoomHideIconState == 0) {
             drawIcon(MainCanvas, chatArrow, CharX + 330 * Zoom, CharY + 5, 15 * Zoom, 15 * Zoom, 700, 0.7, 4, "#f32a40");
             if (MouseHovering(CharX + 330 * Zoom, CharY + 10 * Zoom, 50 * Zoom, 50 * Zoom)) {
                 if (C.MemberNumber === 35982) {
-                    DrawRect(CharX + 270 * Zoom, CharY + 60 * Zoom, 160 * Zoom, 20 * Zoom, "Black")
-                    DrawTextFit("Blue haired Mistress", CharX + 350 * Zoom, CharY + 70 * Zoom, 150 * Zoom, "White", "Black");
+                    DrawTextWithRectangle(MainCanvas, "Blue haired Mistress", 25 * Zoom, CharX + 150 * Zoom, CharY + 60 * Zoom, 250 * Zoom, 40 * Zoom, "Black", "White");
                 } else {
-                    DrawTextWithRectangle(MainCanvas, C.BCR + " version", 25 * Zoom, CharX + 305 * Zoom, CharY + 60 * Zoom, 145 * Zoom, 40 * Zoom, "Black", "White");
+                    DrawTextWithRectangle(MainCanvas, C.BCR + " version", 25 * Zoom, CharX + 250 * Zoom, CharY + 60 * Zoom, 145 * Zoom, 40 * Zoom, "Black", "White");
                 }
             }
         }
