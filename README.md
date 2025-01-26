@@ -13,13 +13,13 @@ as Discord, Messenger, WhatsApp, etc.
 
 To install the stable version, use one of the following methods:
 
-- **Tampermonkey**: [Stable Tampermonkey Link](https://github.com/Arcsery/reply-extension/raw/gh-pages/BCR-1.user.js)
+- **Tampermonkey**: [Stable Tampermonkey Link](https://github.com/SukiaDemon/reply-extension/raw/gh-pages/BCR-1.user.js)
 - **Bookmarklet**: Add this to your bookmarks bar:
 
   ```javascript
   javascript:(function() { 
     var script = document.createElement('script'); 
-    script.src = 'https://arcsery.github.io/reply-extension/bcr.js'; 
+    script.src = 'https://sukiademon.github.io/reply-extension/bcr.js'; 
     document.head.appendChild(script); 
   })();
 

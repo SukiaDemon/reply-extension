@@ -16,6 +16,6 @@
 (function () {
     'use strict';
     var script = document.createElement("script");
-    script.src = "https://arcsery.github.io/reply-extension/bcr.js";
+    script.src = "https://sukiademon.github.io/reply-extension/bcr.js";
     document.head.appendChild(script);
 })();
