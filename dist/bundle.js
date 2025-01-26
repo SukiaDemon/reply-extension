@@ -200,11 +200,24 @@
 	    }
 	    ctx.restore();
 	}
+	function DrawTextWithRectangle(ctx, text, textSize, rectX, rectY, rectWidth, rectHeight, rectColor, textColor) {
+	    ctx.save();
+	    ctx.fillStyle = rectColor;
+	    ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+	    ctx.font = `${textSize}px Arial`;
+	    ctx.textAlign = "center";
+	    ctx.textBaseline = "middle";
+	    ctx.fillStyle = textColor;
+	    ctx.fillText(text, rectX + rectWidth / 2, rectY + rectHeight / 2);
+	    ctx.restore();
+	}
 
 	let isReplyMode = false;
 	let isWaitingForReply = false;
+	let isWaitingForAddButton = false;
 	function reply() {
 	    mod.hookFunction("ChatRoomCharacterViewDrawOverlay", 2, (args, next) => {
+	        ChatRoomCharacterDrawlist.length;
 	        next(args);
 	        const [C, CharX, CharY, Zoom] = args;
 	        if (C.BCR && ChatRoomHideIconState == 0) {
@@ -215,8 +228,9 @@
 	                    DrawTextFit("Blue haired Mistress", CharX + 350 * Zoom, CharY + 70 * Zoom, 150 * Zoom, "White", "Black");
 	                }
 	                else {
-	                    DrawRect(CharX + 305 * Zoom, CharY + 60 * Zoom, 90 * Zoom, 20 * Zoom, "Black");
-	                    DrawTextFit(C.BCR, CharX + 350 * Zoom, CharY + 70 * Zoom, 80 * Zoom, "White", "Black");
+	                    // DrawRect(CharX + 305 * Zoom, CharY + 60 * Zoom, 90 * Zoom, 20 * Zoom, "Black")
+	                    //DrawText(C.BCR + " version", CharX + 350 * Zoom, CharY + 70 * Zoom, "White", "Black")
+	                    DrawTextWithRectangle(MainCanvas, C.BCR + " version", 25 * Zoom, CharX + 305 * Zoom, CharY + 60 * Zoom, 145 * Zoom, 40 * Zoom, "Black", "White");
 	                }
 	            }
 	        }
@@ -228,7 +242,6 @@
 	    mod.hookFunction("ChatRoomMessage", 1, (args, next) => {
 	        if (args[0] && args[0].Type && args[0].Type == "Chat") {
 	            let chatMessage = args[0];
-	            console.log("test");
 	            let replyMessageData = null;
 	            // @ts-ignore
 	            if (chatMessage.Dictionary) {
@@ -241,6 +254,9 @@
 	            }
 	            if (replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
 	                isWaitingForReply = true;
+	            }
+	            if (chatMessage.Content && chatMessage.Sender) {
+	                isWaitingForAddButton = true;
 	            }
 	            next(args);
 	            if (chatMessage.Content && chatMessage.Sender) {
@@ -298,7 +314,11 @@
 	            await waitFor(() => !!addReplyBoxToLastMessage);
 	            next(args);
 	        }
-	        await waitFor(() => !!addButtonToLastMessage);
+	        if (isWaitingForAddButton) {
+	            await waitFor(() => !!addButtonToLastMessage);
+	            isWaitingForAddButton = false;
+	            next(args);
+	        }
 	        next(args);
 	    });
 	}

@@ -2,15 +2,27 @@ import {mod} from "mod";
 import {ReplyContent} from "../models/replyContent";
 import constants from "../utils/constants";
 import {customFocusColor} from "../css/css";
-import {chatArrow, drawIcon, initBCRMessage, replyToInitBCRMessage, waitFor} from "../utils/utils";
+import {
+    chatArrow,
+    drawIcon,
+    DrawTextWithRectangle,
+    initBCRMessage,
+    replyToInitBCRMessage,
+    waitFor
+} from "../utils/utils";
 
 export let isReplyMode: boolean = false;
-export let isWaitingForReply: boolean = false
+export let isWaitingForReply: boolean = false;
+export let isWaitingForAddButton: boolean = false;
 
 export default function reply() {
 
 
     mod.hookFunction("ChatRoomCharacterViewDrawOverlay", 2, (args, next) => {
+        let PlayerCountInRoom: number = ChatRoomCharacterDrawlist.length;
+        if (PlayerCountInRoom > 5) {
+            PlayerCountInRoom = 5;
+        }
         next(args);
         const [C, CharX, CharY, Zoom] = args;
         if (C.BCR && ChatRoomHideIconState == 0) {
@@ -20,8 +32,7 @@ export default function reply() {
                     DrawRect(CharX + 270 * Zoom, CharY + 60 * Zoom, 160 * Zoom, 20 * Zoom, "Black")
                     DrawTextFit("Blue haired Mistress", CharX + 350 * Zoom, CharY + 70 * Zoom, 150 * Zoom, "White", "Black");
                 } else {
-                    DrawRect(CharX + 305 * Zoom, CharY + 60 * Zoom, 90 * Zoom, 20 * Zoom, "Black")
-                    DrawTextFit(C.BCR, CharX + 350 * Zoom, CharY + 70 * Zoom, 80 * Zoom, "White", "Black");
+                    DrawTextWithRectangle(MainCanvas, C.BCR + " version", 25 * Zoom, CharX + 305 * Zoom, CharY + 60 * Zoom, 145 * Zoom, 40 * Zoom, "Black", "White");
                 }
             }
         }
@@ -49,6 +60,10 @@ export default function reply() {
 
             if (replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
                 isWaitingForReply = true;
+            }
+
+            if (chatMessage.Content && chatMessage.Sender) {
+                isWaitingForAddButton = true;
             }
 
             next(args)
@@ -114,16 +129,20 @@ export default function reply() {
     mod.hookFunction("ElementScrollToEnd", 1, async (args, next) => {
         if (isWaitingForReply) {
             await waitFor(() => !!addReplyBoxToLastMessage);
-            next(args)
+            next(args);
         }
-        await waitFor(() => !!addButtonToLastMessage);
+        if (isWaitingForAddButton) {
+            await waitFor(() => !!addButtonToLastMessage);
+            isWaitingForAddButton = false;
+            next(args);
+        }
         next(args)
     })
 }
 
 export let repliedMessage: string = "";
-export let repliedMessageAuthor: string
-export let repliedMessageAuthorNumber: number
+export let repliedMessageAuthor: string;
+export let repliedMessageAuthorNumber: number;
 
 function addButtonToLastMessage(messageText: string, messageSenderNumber: number) {
     const chatContainer = document.querySelector(constants.TEXT_AREA_CHAT_LOG);

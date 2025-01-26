@@ -85,3 +85,26 @@ export function drawIcon(
     }
     ctx.restore();
 }
+
+export function DrawTextWithRectangle(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    textSize: number,
+    rectX: number, rectY: number,
+    rectWidth: number, rectHeight: number,
+    rectColor: string,
+    textColor: string,
+) {
+    ctx.save();
+    ctx.fillStyle = rectColor
+    ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+
+    ctx.font = `${textSize}px Arial`
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = textColor;
+
+    ctx.fillText(text, rectX + rectWidth / 2, rectY + rectHeight / 2);
+
+    ctx.restore()
+}
