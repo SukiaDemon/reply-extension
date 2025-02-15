@@ -275,6 +275,7 @@
         chatReplyButtonCss();
         chatReplyBoxCss();
         chatReplyClose();
+        chatReplyFlashCss();
     }
 
     function chatReplyButtonCss() {
@@ -283,10 +284,9 @@
     .ChatReplyButton {
         text-decoration: none;
         font-style: normal;
-        display: inline;
         cursor: pointer;
         font-size: smaller;
-        display: none;
+        visibility: hidden;
     }
     `;
         document.head.appendChild(style);
@@ -330,6 +330,24 @@
         }
         
         `;
+        document.head.appendChild(style);
+    }
+
+    function chatReplyFlashCss() {
+        const style = document.createElement("style");
+        style.innerHTML = `
+        @keyframes flashBackground {
+            0% { background-color: #ff9f9f; }
+            25% { background-color: #ffcf9f; }
+            50% { background-color: #9fff9f; }
+            75% { background-color: #9fcfff; }
+            100% { background-color: transparent; }
+        }
+
+        .flash-animation {
+            animation: flashBackground 2s ease-in-out infinite;
+        }
+    `;
         document.head.appendChild(style);
     }
 
@@ -407,8 +425,21 @@
         ctx.restore();
     }
 
+    function DrawTextWithRectangle(ctx, text, textSize, rectX, rectY, rectWidth, rectHeight, rectColor, textColor) {
+        ctx.save();
+        ctx.fillStyle = rectColor;
+        ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+        ctx.font = `${textSize}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = textColor;
+        ctx.fillText(text, rectX + rectWidth / 2, rectY + rectHeight / 2);
+        ctx.restore();
+    }
+
     let isReplyMode = false;
     let isWaitingForReply = false;
+    let isWaitingForAddButton = false;
 
     function reply() {
         mod.hookFunction("ChatRoomCharacterViewDrawOverlay", 2, (args, next) => {
@@ -418,11 +449,9 @@
                 drawIcon(MainCanvas, chatArrow, CharX + 330 * Zoom, CharY + 5, 15 * Zoom, 15 * Zoom, 700, 0.7, 4, "#f32a40");
                 if (MouseHovering(CharX + 330 * Zoom, CharY + 10 * Zoom, 50 * Zoom, 50 * Zoom)) {
                     if (C.MemberNumber === 35982) {
-                        DrawRect(CharX + 270 * Zoom, CharY + 60 * Zoom, 160 * Zoom, 20 * Zoom, "Black");
-                        DrawTextFit("Blue haired Mistress", CharX + 350 * Zoom, CharY + 70 * Zoom, 150 * Zoom, "White", "Black");
+                        DrawTextWithRectangle(MainCanvas, "Blue haired Mistress", 25 * Zoom, CharX + 150 * Zoom, CharY + 60 * Zoom, 250 * Zoom, 40 * Zoom, "Black", "White");
                     } else {
-                        DrawRect(CharX + 305 * Zoom, CharY + 60 * Zoom, 90 * Zoom, 20 * Zoom, "Black");
-                        DrawTextFit(C.BCR, CharX + 350 * Zoom, CharY + 70 * Zoom, 80 * Zoom, "White", "Black");
+                        DrawTextWithRectangle(MainCanvas, C.BCR + " version", 25 * Zoom, CharX + 250 * Zoom, CharY + 60 * Zoom, 145 * Zoom, 40 * Zoom, "Black", "White");
                     }
                 }
             }
@@ -434,22 +463,46 @@
         mod.hookFunction("ChatRoomMessage", 1, (args, next) => {
             if (args[0] && args[0].Type && args[0].Type == "Chat") {
                 let chatMessage = args[0];
+                let replyMessageData = null;
+                let bcrID = null;
+                let repliedBcrID = null;
                 // @ts-ignore
-                let replyMessageData = chatMessage.Dictionary.find(obj => {
-                    if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
-                        return obj;
-                    }
-                    return false;
-                });
-                if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
+                if (chatMessage.Dictionary) {
+                    chatMessage.Dictionary.find(obj => {
+                        if (obj['uniqueBcrID']) {
+                            bcrID = obj['uniqueBcrID'];
+                        }
+                        if (obj['repliedBcrID']) {
+                            repliedBcrID = obj['repliedBcrID'];
+                        }
+                    });
+                    replyMessageData = chatMessage.Dictionary.find(obj => {
+                        if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
+                            return obj;
+                        }
+                        return false;
+                    });
+                }
+                if (replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
                     isWaitingForReply = true;
                 }
-                next(args);
                 if (chatMessage.Content && chatMessage.Sender) {
-                    addButtonToLastMessage(args[0].Content, args[0].Sender);
+                    isWaitingForAddButton = true;
+                }
+                next(args);
+                const chatContainer = document.querySelector(constants.TEXT_AREA_CHAT_LOG);
+                let lastMessage = null;
+                if (chatContainer) {
+                    lastMessage = chatContainer.querySelector(constants.CHAT_MESSAGE_CHAT_LAST_OF_TYPE);
+                }
+                if (lastMessage) {
+                    lastMessage.setAttribute("bcrID", bcrID);
+                }
+                if (chatMessage.Content && chatMessage.Sender) {
+                    addButtonToLastMessage(lastMessage, args[0].Content, args[0].Sender, bcrID);
                 }
                 if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
-                    addReplyBoxToLastMessage(replyMessageData.repliedMessage, replyMessageData.repliedMessageAuthor);
+                    addReplyBoxToLastMessage(chatContainer, lastMessage, replyMessageData.repliedMessage, replyMessageData.repliedMessageAuthor, repliedBcrID);
                 }
             } else {
                 next(args);
@@ -472,11 +525,15 @@
                 isReplyMessage: isReplyMode,
                 targetId: repliedMessageAuthorNumber,
                 repliedMessage: repliedMessage,
-                repliedMessageAuthor: repliedMessageAuthor
+                repliedMessageAuthor: repliedMessageAuthor,
+                repliedBcrID: repliedBcrID,
+                uniqueBcrID: Date.now()
             };
             if (args[1] && args[1]["Content"] && args[1]["Type"] == "Chat") {
                 if (isReplyMode) {
                     args[1]["Dictionary"].push(replyMessageData);
+                } else {
+                    args[1]["Dictionary"].push({uniqueBcrID: Date.now()});
                 }
                 next(args);
                 isReplyMode = false;
@@ -498,6 +555,11 @@
                 await waitFor(() => !!addReplyBoxToLastMessage);
                 next(args);
             }
+            if (isWaitingForAddButton) {
+                await waitFor(() => !!addButtonToLastMessage);
+                isWaitingForAddButton = false;
+                next(args);
+            }
             next(args);
         });
     }
@@ -505,21 +567,28 @@
     let repliedMessage = "";
     let repliedMessageAuthor;
     let repliedMessageAuthorNumber;
+    let repliedBcrID;
 
-    function addButtonToLastMessage(messageText, messageSenderNumber) {
-        const chatContainer = document.querySelector(constants.TEXT_AREA_CHAT_LOG);
-        let lastMessage = null;
-        if (chatContainer) {
-            lastMessage = chatContainer.querySelector(constants.CHAT_MESSAGE_CHAT_LAST_OF_TYPE);
-        }
+    function addButtonToLastMessage(lastMessage, messageText, messageSenderNumber, bcrID) {
         if (lastMessage) {
             const userNameDiv = lastMessage.querySelector('.ChatMessageName');
             const userName = userNameDiv.innerText;
-            let button = ElementButton.Create(null, () => {
+            const span = document.createElement("span");
+            span.classList.add("ChatReplyButton");
+            lastMessage.onmouseenter = () => {
+                span.style.visibility = "visible";
+            };
+            lastMessage.onmouseleave = () => {
+                span.style.visibility = "hidden";
+            };
+            span.innerHTML = "&nbsp\u21a9\ufe0f";
+            span.onclick = () => {
+                {
                     const closeButtonHtml = document.getElementById(constants.CHAT_ROOM_REPLY_CLOSE);
                     repliedMessage = messageText;
                     repliedMessageAuthor = userName;
                     repliedMessageAuthorNumber = messageSenderNumber;
+                    repliedBcrID = bcrID;
                     const chatInput = document.getElementById(constants.InputChat_DIV_ID);
                     //chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
                     isReplyMode = true;
@@ -555,34 +624,44 @@
                         collapseButton.textContent = ">";
                         buttonBox.appendChild(closeButton);
                     }
-                },
-                // @ts-ignore
-                {noStyling: true}, {button: {classList: ["ChatReplyButton"], children: [" \u21a9\ufe0f"]}});
-            lastMessage.onmouseenter = () => {
-                button.style.display = "inline-block";
+                }
             };
-            lastMessage.onmouseleave = () => {
-                button.style.display = "none";
-            };
-            lastMessage.appendChild(button);
+            lastMessage.appendChild(span);
         }
     }
 
-    function addReplyBoxToLastMessage(messageText, messageSender) {
+    function addReplyBoxToLastMessage(chatContainer, lastMessage, messageText, messageSender, bcrID) {
         if (messageText && messageSender) {
             const replyDiv = ElementCreateDiv("replyMessageDiv" + new Date().getTime());
+            replyDiv.setAttribute("repliedBcrID", bcrID);
+            let targetReplyBoxDiv = chatContainer.querySelector(`[bcrID="${bcrID}"]`);
+            replyDiv.onclick = () => {
+                if (chatContainer) {
+                    if (targetReplyBoxDiv) {
+                        chatContainer.scrollTo({
+                            // @ts-ignore
+                            top: targetReplyBoxDiv.offsetTop - chatContainer.offsetTop - 100,
+                            behavior: 'smooth',
+                        });
+                        targetReplyBoxDiv.classList.add('flash-animation');
+                        setTimeout(() => {
+                            targetReplyBoxDiv.classList.remove('flash-animation');
+                        }, 2000);
+                    } else {
+                        console.log("No ReplyBox with that bcrID!");
+                    }
+                }
+            };
             const maxLength = 100;
             if (messageText.length >= maxLength) {
                 messageText = messageText.slice(0, maxLength) + "...";
             }
             replyDiv.textContent = messageSender + ": " + messageText;
             replyDiv.classList.add("ChatReplyBox");
-            const chatContainer = document.querySelector(constants.TEXT_AREA_CHAT_LOG);
-            let lastMessage = null;
-            if (chatContainer) {
-                lastMessage = chatContainer.querySelector(constants.CHAT_MESSAGE_CHAT_LAST_OF_TYPE);
-            }
             if (lastMessage) {
+                if (targetReplyBoxDiv) {
+                    replyDiv.style.cursor = 'pointer';
+                }
                 chatContainer.insertBefore(replyDiv, lastMessage);
             }
             isWaitingForReply = false;

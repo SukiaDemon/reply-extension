@@ -24,6 +24,7 @@ To install the stable version, use one of the following methods:
   })();
 
 - Reply to specific messages in the chat.
+- auto scroll to original message after clicking on the reply box
 - Customizable colors for the reply box, reply box text, and borders when in reply mode.
 
 ## Screenshots
