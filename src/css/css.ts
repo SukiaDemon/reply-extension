@@ -24,6 +24,7 @@ export function loadCss() {
     chatReplyButtonCss();
     chatReplyBoxCss();
     chatReplyClose();
+    chatReplyFlashCss();
 }
 
 function chatReplyButtonCss() {
@@ -78,5 +79,23 @@ function chatReplyClose() {
         }
         
         `;
+    document.head.appendChild(style);
+}
+
+function chatReplyFlashCss() {
+    const style = document.createElement("style");
+    style.innerHTML = `
+        @keyframes flashBackground {
+            0% { background-color: #ff9f9f; }
+            25% { background-color: #ffcf9f; }
+            50% { background-color: #9fff9f; }
+            75% { background-color: #9fcfff; }
+            100% { background-color: transparent; }
+        }
+
+        .flash-animation {
+            animation: flashBackground 2s ease-in-out infinite;
+        }
+    `;
     document.head.appendChild(style);
 }

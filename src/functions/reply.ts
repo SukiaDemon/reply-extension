@@ -43,8 +43,20 @@ export default function reply() {
         if (args[0] && args[0].Type && args[0].Type == "Chat") {
             let chatMessage = args[0];
             let replyMessageData: ReplyContent = null;
+            let bcrID: number = null;
+            let repliedBcrID: number = null
             // @ts-ignore
             if (chatMessage.Dictionary) {
+
+                chatMessage.Dictionary.find(obj => {
+                    if (obj['uniqueBcrID']) {
+                        bcrID = obj['uniqueBcrID'];
+                    }
+                    if (obj['repliedBcrID']) {
+                        repliedBcrID = obj['repliedBcrID'];
+                    }
+                })
+
                 replyMessageData = chatMessage.Dictionary.find(obj => {
                     if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
                         return obj as unknown as ReplyContent;
@@ -63,12 +75,23 @@ export default function reply() {
 
             next(args)
 
+            const chatContainer = document.querySelector(constants.TEXT_AREA_CHAT_LOG) as HTMLElement;
+            let lastMessage = null;
+
+            if (chatContainer) {
+                lastMessage = chatContainer.querySelector(constants.CHAT_MESSAGE_CHAT_LAST_OF_TYPE);
+            }
+            if (lastMessage) {
+                lastMessage.setAttribute("bcrID", bcrID)
+            }
+
+
             if (chatMessage.Content && chatMessage.Sender) {
-                addButtonToLastMessage(args[0].Content, args[0].Sender);
+                addButtonToLastMessage(lastMessage, args[0].Content, args[0].Sender, bcrID);
             }
 
             if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
-                addReplyBoxToLastMessage(replyMessageData.repliedMessage, replyMessageData.repliedMessageAuthor)
+                addReplyBoxToLastMessage(chatContainer, lastMessage, replyMessageData.repliedMessage, replyMessageData.repliedMessageAuthor, repliedBcrID)
             }
 
         } else {
@@ -95,11 +118,16 @@ export default function reply() {
             isReplyMessage: isReplyMode,
             targetId: repliedMessageAuthorNumber,
             repliedMessage: repliedMessage,
-            repliedMessageAuthor: repliedMessageAuthor
+            repliedMessageAuthor: repliedMessageAuthor,
+            repliedBcrID: repliedBcrID,
+            uniqueBcrID: Date.now()
         };
         if (args[1] && args[1]["Content"] && args[1]["Type"] == "Chat") {
             if (isReplyMode) {
                 args[1]["Dictionary"].push(replyMessageData);
+            } else {
+                args[1]["Dictionary"].push(
+                    {uniqueBcrID: Date.now()})
             }
 
             next(args);
@@ -138,18 +166,13 @@ export default function reply() {
 export let repliedMessage: string = "";
 export let repliedMessageAuthor: string;
 export let repliedMessageAuthorNumber: number;
+export let repliedBcrID: number;
 
-function addButtonToLastMessage(messageText: string, messageSenderNumber: number) {
-    const chatContainer = document.querySelector(constants.TEXT_AREA_CHAT_LOG);
-    let lastMessage = null;
-
-    if (chatContainer) {
-        lastMessage = chatContainer.querySelector(constants.CHAT_MESSAGE_CHAT_LAST_OF_TYPE);
-    }
+function addButtonToLastMessage(lastMessage: HTMLElement | null, messageText: string, messageSenderNumber: number, bcrID: number) {
 
     if (lastMessage) {
 
-        const userNameDiv = lastMessage.querySelector('.ChatMessageName');
+        const userNameDiv = lastMessage.querySelector('.ChatMessageName') as HTMLElement;
         const userName = userNameDiv.innerText;
 
         const span = document.createElement("span");
@@ -171,6 +194,7 @@ function addButtonToLastMessage(messageText: string, messageSenderNumber: number
                 repliedMessage = messageText;
                 repliedMessageAuthor = userName;
                 repliedMessageAuthorNumber = messageSenderNumber;
+                repliedBcrID = bcrID;
 
                 const chatInput: HTMLTextAreaElement | null = document.getElementById(constants.InputChat_DIV_ID) as HTMLTextAreaElement | null;
                 //chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
@@ -221,10 +245,31 @@ function addButtonToLastMessage(messageText: string, messageSenderNumber: number
     }
 }
 
-function addReplyBoxToLastMessage(messageText: string, messageSender: string) {
+function addReplyBoxToLastMessage(chatContainer: HTMLElement, lastMessage: HTMLElement, messageText: string, messageSender: string, bcrID: number) {
 
     if (messageText && messageSender) {
         const replyDiv = ElementCreateDiv("replyMessageDiv" + new Date().getTime());
+        replyDiv.setAttribute("repliedBcrID", bcrID);
+        let targetReplyBoxDiv = chatContainer.querySelector(`[bcrID="${bcrID}"]`) as HTMLElement;
+
+        replyDiv.onclick = () => {
+            if (chatContainer) {
+                if (targetReplyBoxDiv) {
+                    chatContainer.scrollTo({
+                        // @ts-ignore
+                        top: targetReplyBoxDiv.offsetTop - chatContainer.offsetTop - 100,
+                        behavior: 'smooth',
+                    });
+                    targetReplyBoxDiv.classList.add('flash-animation');
+
+                    setTimeout(() => {
+                        targetReplyBoxDiv.classList.remove('flash-animation');
+                    }, 2000);
+                } else {
+                    console.log("No ReplyBox with that bcrID!")
+                }
+            }
+        }
 
         const maxLength = 100;
 
@@ -235,14 +280,10 @@ function addReplyBoxToLastMessage(messageText: string, messageSender: string) {
         replyDiv.textContent = messageSender + ": " + messageText;
         replyDiv.classList.add("ChatReplyBox");
 
-        const chatContainer = document.querySelector(constants.TEXT_AREA_CHAT_LOG);
-        let lastMessage = null;
-
-        if (chatContainer) {
-            lastMessage = chatContainer.querySelector(constants.CHAT_MESSAGE_CHAT_LAST_OF_TYPE);
-        }
-
         if (lastMessage) {
+            if (targetReplyBoxDiv) {
+                replyDiv.style.cursor = 'pointer'
+            }
             chatContainer.insertBefore(replyDiv, lastMessage);
         }
 
