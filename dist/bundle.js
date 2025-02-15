@@ -78,6 +78,7 @@
 	    chatReplyButtonCss();
 	    chatReplyBoxCss();
 	    chatReplyClose();
+	    chatReplyFlashCss();
 	}
 	function chatReplyButtonCss() {
 	    const style = document.createElement("style");
@@ -129,6 +130,23 @@
         }
         
         `;
+	    document.head.appendChild(style);
+	}
+	function chatReplyFlashCss() {
+	    const style = document.createElement("style");
+	    style.innerHTML = `
+        @keyframes flashBackground {
+            0% { background-color: #ff9f9f; }
+            25% { background-color: #ffcf9f; }
+            50% { background-color: #9fff9f; }
+            75% { background-color: #9fcfff; }
+            100% { background-color: transparent; }
+        }
+
+        .flash-animation {
+            animation: flashBackground 2s ease-in-out infinite;
+        }
+    `;
 	    document.head.appendChild(style);
 	}
 
@@ -239,8 +257,18 @@
 	        if (args[0] && args[0].Type && args[0].Type == "Chat") {
 	            let chatMessage = args[0];
 	            let replyMessageData = null;
+	            let bcrID = null;
+	            let repliedBcrID = null;
 	            // @ts-ignore
 	            if (chatMessage.Dictionary) {
+	                chatMessage.Dictionary.find(obj => {
+	                    if (obj['uniqueBcrID']) {
+	                        bcrID = obj['uniqueBcrID'];
+	                    }
+	                    if (obj['repliedBcrID']) {
+	                        repliedBcrID = obj['repliedBcrID'];
+	                    }
+	                });
 	                replyMessageData = chatMessage.Dictionary.find(obj => {
 	                    if (obj[constants.IS_REPLY_MESSAGE] && obj[constants.IS_REPLY_MESSAGE] == true) {
 	                        return obj;
@@ -255,11 +283,19 @@
 	                isWaitingForAddButton = true;
 	            }
 	            next(args);
+	            const chatContainer = document.querySelector(constants.TEXT_AREA_CHAT_LOG);
+	            let lastMessage = null;
+	            if (chatContainer) {
+	                lastMessage = chatContainer.querySelector(constants.CHAT_MESSAGE_CHAT_LAST_OF_TYPE);
+	            }
+	            if (lastMessage) {
+	                lastMessage.setAttribute("bcrID", bcrID);
+	            }
 	            if (chatMessage.Content && chatMessage.Sender) {
-	                addButtonToLastMessage(args[0].Content, args[0].Sender);
+	                addButtonToLastMessage(lastMessage, args[0].Content, args[0].Sender, bcrID);
 	            }
 	            if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
-	                addReplyBoxToLastMessage(replyMessageData.repliedMessage, replyMessageData.repliedMessageAuthor);
+	                addReplyBoxToLastMessage(chatContainer, lastMessage, replyMessageData.repliedMessage, replyMessageData.repliedMessageAuthor, repliedBcrID);
 	            }
 	        }
 	        else {
@@ -283,11 +319,16 @@
 	            isReplyMessage: isReplyMode,
 	            targetId: repliedMessageAuthorNumber,
 	            repliedMessage: repliedMessage,
-	            repliedMessageAuthor: repliedMessageAuthor
+	            repliedMessageAuthor: repliedMessageAuthor,
+	            repliedBcrID: repliedBcrID,
+	            uniqueBcrID: Date.now()
 	        };
 	        if (args[1] && args[1]["Content"] && args[1]["Type"] == "Chat") {
 	            if (isReplyMode) {
 	                args[1]["Dictionary"].push(replyMessageData);
+	            }
+	            else {
+	                args[1]["Dictionary"].push({ uniqueBcrID: Date.now() });
 	            }
 	            next(args);
 	            isReplyMode = false;
@@ -321,12 +362,8 @@
 	let repliedMessage = "";
 	let repliedMessageAuthor;
 	let repliedMessageAuthorNumber;
-	function addButtonToLastMessage(messageText, messageSenderNumber) {
-	    const chatContainer = document.querySelector(constants.TEXT_AREA_CHAT_LOG);
-	    let lastMessage = null;
-	    if (chatContainer) {
-	        lastMessage = chatContainer.querySelector(constants.CHAT_MESSAGE_CHAT_LAST_OF_TYPE);
-	    }
+	let repliedBcrID;
+	function addButtonToLastMessage(lastMessage, messageText, messageSenderNumber, bcrID) {
 	    if (lastMessage) {
 	        const userNameDiv = lastMessage.querySelector('.ChatMessageName');
 	        const userName = userNameDiv.innerText;
@@ -345,6 +382,7 @@
 	                repliedMessage = messageText;
 	                repliedMessageAuthor = userName;
 	                repliedMessageAuthorNumber = messageSenderNumber;
+	                repliedBcrID = bcrID;
 	                const chatInput = document.getElementById(constants.InputChat_DIV_ID);
 	                //chatInput.value = `/reply ${sender} ${chatInput.value.replace(/\/reply\s*\d+ ?/u, "")}`;
 	                isReplyMode = true;
@@ -385,21 +423,39 @@
 	        lastMessage.appendChild(span);
 	    }
 	}
-	function addReplyBoxToLastMessage(messageText, messageSender) {
+	function addReplyBoxToLastMessage(chatContainer, lastMessage, messageText, messageSender, bcrID) {
 	    if (messageText && messageSender) {
 	        const replyDiv = ElementCreateDiv("replyMessageDiv" + new Date().getTime());
+	        replyDiv.setAttribute("repliedBcrID", bcrID);
+	        let targetReplyBoxDiv = chatContainer.querySelector(`[bcrID="${bcrID}"]`);
+	        replyDiv.onclick = () => {
+	            if (chatContainer) {
+	                if (targetReplyBoxDiv) {
+	                    chatContainer.scrollTo({
+	                        // @ts-ignore
+	                        top: targetReplyBoxDiv.offsetTop - chatContainer.offsetTop - 100,
+	                        behavior: 'smooth',
+	                    });
+	                    targetReplyBoxDiv.classList.add('flash-animation');
+	                    setTimeout(() => {
+	                        targetReplyBoxDiv.classList.remove('flash-animation');
+	                    }, 2000);
+	                }
+	                else {
+	                    console.log("No ReplyBox with that bcrID!");
+	                }
+	            }
+	        };
 	        const maxLength = 100;
 	        if (messageText.length >= maxLength) {
 	            messageText = messageText.slice(0, maxLength) + "...";
 	        }
 	        replyDiv.textContent = messageSender + ": " + messageText;
 	        replyDiv.classList.add("ChatReplyBox");
-	        const chatContainer = document.querySelector(constants.TEXT_AREA_CHAT_LOG);
-	        let lastMessage = null;
-	        if (chatContainer) {
-	            lastMessage = chatContainer.querySelector(constants.CHAT_MESSAGE_CHAT_LAST_OF_TYPE);
-	        }
 	        if (lastMessage) {
+	            if (targetReplyBoxDiv) {
+	                replyDiv.style.cursor = 'pointer';
+	            }
 	            chatContainer.insertBefore(replyDiv, lastMessage);
 	        }
 	        isWaitingForReply = false;
