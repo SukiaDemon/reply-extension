@@ -257,7 +257,7 @@ function addReplyBoxToLastMessage(chatContainer: HTMLElement, lastMessage: HTMLE
                 if (targetReplyBoxDiv) {
                     chatContainer.scrollTo({
                         // @ts-ignore
-                        top: targetReplyBoxDiv.offsetTop - chatContainer.offsetTop - 100,
+                        top: targetReplyBoxDiv.offsetTop - chatContainer.offsetTop - 200,
                         behavior: 'smooth',
                     });
                     targetReplyBoxDiv.classList.add('flash-animation');

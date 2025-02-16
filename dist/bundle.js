@@ -433,7 +433,7 @@
 	                if (targetReplyBoxDiv) {
 	                    chatContainer.scrollTo({
 	                        // @ts-ignore
-	                        top: targetReplyBoxDiv.offsetTop - chatContainer.offsetTop - 100,
+	                        top: targetReplyBoxDiv.offsetTop - chatContainer.offsetTop - 200,
 	                        behavior: 'smooth',
 	                    });
 	                    targetReplyBoxDiv.classList.add('flash-animation');
@@ -535,7 +535,7 @@
 	            PreferenceSubScreenBCRSettingsExit();
 	        }
 	        if (MouseIn(1350, 75, 400, 90)) { //Open Source
-	            window.open("https://github.com/Arcsery/reply-extension/tree/gh-pages", "_blank");
+	            window.open("https://github.com/SukiaDemon/reply-extension/tree/gh-pages", "_blank");
 	        }
 	        if (MouseIn(1140, 215, 65, 65)) { //ReplyBoxBackgroundColor Icon Click
 	            hideTextColorPicker = true;
