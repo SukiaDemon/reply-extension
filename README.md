@@ -8,6 +8,7 @@ as Discord, Messenger, WhatsApp, etc.
 ## Features
 
 - Reply to specific messages in the chat.
+- Auto scroll to original message after clicking on the reply box
 - Customizable colors for the reply box, reply box text, and borders when in reply mode.
 
 ## Installation
