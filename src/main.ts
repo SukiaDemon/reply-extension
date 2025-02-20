@@ -1,4 +1,3 @@
-import commands from "functions/commands";
 import reply from "functions/reply";
 import {loadCss} from "./css/css";
 import {settingsPage} from "./settings/settingsPage";
@@ -24,7 +23,6 @@ async function BCRStart() {
         settings();
         await settingsPage()
         loadCss();
-        commands();
         reply();
         console.log("BCR " + constants.MOD_VERSION + " loaded!")
         // @ts-ignore

@@ -39,10 +39,6 @@
 	    CHAT_MESSAGE_CHAT_LAST_OF_TYPE: ".ChatMessageChat:last-of-type"
 	};
 
-	/*const MOD_NAME = "BCA";
-	const MOD_FULL_NAME = "Bondage Club Additions";
-	const MOD_VERSION = "0.1.0";
-	const MOD_REPOSITORY = "";*/
 	let mod = null;
 	// @ts-ignore
 	if (!window.BCR_VERSION) {
@@ -462,30 +458,6 @@
 	    }
 	}
 
-	function commands() {
-	    CommandCombine({
-	        Tag: "reply",
-	        "Description": "reply to a chat message",
-	        Action: (args) => {
-	            const [targetNumber, ...messageParts] = args.split(" ");
-	            const message = messageParts.join(" ");
-	            if (message && message != "") {
-	                let generatedMessage = ChatRoomGenerateChatRoomChatMessage("Chat", message);
-	                ServerSend("ChatRoomChat", {
-	                    Content: generatedMessage.Content,
-	                    Type: generatedMessage.Type,
-	                    Target: generatedMessage.Target,
-	                    Dictionary: [
-	                        { targetId: targetNumber, repliedMessage: repliedMessage, targetUser: repliedMessageAuthor },
-	                    ]
-	                });
-	            }
-	            Player.ExtensionSettings.BCA.repliedMessage = "";
-	            Player.ExtensionSettings.BCA.targetUser = "";
-	        }
-	    });
-	}
-
 	const defaultSettings = {
 	    replyBackgroundColor: "#D3D3D3",
 	    replyTextColor: "#000000",
@@ -656,7 +628,6 @@
 	        settings();
 	        await settingsPage();
 	        loadCss();
-	        commands();
 	        reply();
 	        console.log("BCR " + constants.MOD_VERSION + " loaded!");
 	        // @ts-ignore
