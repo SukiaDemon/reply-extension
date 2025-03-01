@@ -81,12 +81,12 @@ export default function reply() {
             if (chatContainer) {
                 lastMessage = chatContainer.querySelector(constants.CHAT_MESSAGE_CHAT_LAST_OF_TYPE);
             }
-            if (lastMessage) {
+            if (lastMessage && bcrID) {
                 lastMessage.setAttribute("bcrID", bcrID)
             }
 
 
-            if (chatMessage.Content && chatMessage.Sender) {
+            if (chatMessage.Content && chatMessage.Sender && bcrID) {
                 addButtonToLastMessage(lastMessage, args[0].Content, args[0].Sender, bcrID);
             }
 
@@ -123,11 +123,15 @@ export default function reply() {
             uniqueBcrID: Date.now()
         };
         if (args[1] && args[1]["Content"] && args[1]["Type"] == "Chat") {
+            let dictionary = args[1]["Dictionary"];
             if (isReplyMode) {
-                args[1]["Dictionary"].push(replyMessageData);
+                if (dictionary) {
+                    dictionary.push(replyMessageData);
+                }
             } else {
-                args[1]["Dictionary"].push(
-                    {uniqueBcrID: Date.now()})
+                if (dictionary) {
+                    dictionary.push({uniqueBcrID: Date.now()})
+                }
             }
 
             next(args);
