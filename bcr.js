@@ -494,7 +494,7 @@
                 if (lastMessage && bcrID) {
                     lastMessage.setAttribute("bcrID", bcrID);
                 }
-                if (chatMessage.Content && chatMessage.Sender && bcrID) {
+                if (chatMessage.Content && chatMessage.Sender) {
                     addButtonToLastMessage(lastMessage, args[0].Content, args[0].Sender, bcrID);
                 }
                 if (chatMessage.Dictionary && replyMessageData && replyMessageData.repliedMessage && replyMessageData.repliedMessageAuthor) {
@@ -634,8 +634,12 @@
     function addReplyBoxToLastMessage(chatContainer, lastMessage, messageText, messageSender, bcrID) {
         if (messageText && messageSender) {
             const replyDiv = ElementCreateDiv("replyMessageDiv" + new Date().getTime());
-            replyDiv.setAttribute("repliedBcrID", bcrID);
-            let targetReplyBoxDiv = chatContainer.querySelector(`[bcrID="${bcrID}"]`);
+            let targetReplyBoxDiv = null;
+            if (bcrID) {
+                targetReplyBoxDiv = chatContainer.querySelector(`[bcrID="${bcrID}"]`);
+                replyDiv.setAttribute("repliedBcrID", bcrID);
+            }
+            console.log(targetReplyBoxDiv);
             replyDiv.onclick = () => {
                 if (chatContainer) {
                     if (targetReplyBoxDiv) {
